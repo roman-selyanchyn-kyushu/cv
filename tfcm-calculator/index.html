@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TFC Membrane Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f5f4f0;
+      --surface:   #ffffff;
+      --surface2:  #f0efe9;
+      --border:    #d8d6ce;
+      --border2:   #e8e7e2;
+      --text:      #1a1916;
+      --muted:     #7a7870;
+      --accent:    #1a4d8f;
+      --accent2:   #c0392b;
+      --accent3:   #217a4b;
+      --accent4:   #8b5e00;
+      --mono:      'IBM Plex Mono', monospace;
+      --sans:      'IBM Plex Sans', sans-serif;
+      --radius:    4px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    header {
+      background: var(--text);
+      color: #f5f4f0;
+      padding: 20px 32px;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      border-bottom: 3px solid var(--accent);
+    }
+
+    header h1 {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header .sub {
+      font-size: 0.8rem;
+      color: #a09e98;
+      font-family: var(--mono);
+    }
+
+    /* back to the Apps index of the personal site */
+    header .back-link {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #a09e98;
+      text-decoration: none;
+      border: 1px solid #3a3934;
+      border-radius: var(--radius);
+      padding: 5px 12px;
+      white-space: nowrap;
+      transition: 0.12s;
+    }
+
+    header .back-link:hover { color: #fff; border-color: #6a6862; background: #26251f; }
+
+    /* ── Layout ──────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      min-height: calc(100vh - 63px);
+    }
+
+    /* ── Left panel (inputs) ─────────────────── */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 0;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 63px);
+    }
+
+    .sidebar-inner {
+      padding: 24px 22px 32px;
+    }
+
+    .sec-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 14px 0 8px;
+      border-bottom: 1px solid var(--border2);
+      margin-bottom: 10px;
+    }
+
+    .sec-label:first-child { padding-top: 0; }
+
+    /* layer color tags */
+    .sec-label .tag {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .field-header {
+      display: grid;
+      grid-template-columns: 1fr 68px 68px 68px;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .field-header span {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .field-header span:first-child { text-align: left; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 68px 68px 68px;
+      gap: 6px;
+      margin-bottom: 5px;
+      align-items: center;
+    }
+
+    .field-row.single {
+      grid-template-columns: 1fr 68px;
+    }
+
+    .field-label {
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+
+    input[type="number"] {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 5px 7px;
+      color: var(--text);
+      width: 100%;
+      text-align: right;
+      outline: none;
+      transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    .hint-box {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.55;
+    }
+
+    .hint-box b { color: var(--text); font-weight: 500; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    button {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius);
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: 0.12s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      flex: 1;
+    }
+
+    .btn-primary:hover { background: #1a3d6e; }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { color: var(--text); border-color: var(--border); background: var(--border2); }
+
+    /* ── Right panel (outputs) ───────────────── */
+    .main {
+      background: var(--bg);
+      padding: 24px 28px 40px;
+      overflow-y: auto;
+    }
+
+    /* ── KPI cards ───────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+    }
+
+    .kpi .k-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi .k-value {
+      font-family: var(--mono);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .kpi .k-unit {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .kpi.highlight { border-color: var(--accent); border-left-width: 3px; }
+
+    /* ── Chart sections ───────────────────────── */
+    .chart-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border2);
+      background: var(--surface);
+    }
+
+    .chart-head-left h3 {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .chart-head-left p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .chart-head-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .leg-swatch {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .leg-swatch.square {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .btn-export {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn-export:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .chart-body {
+      padding: 18px;
+    }
+
+    canvas.chart-canvas {
+      display: block;
+      width: 100%;
+      border-radius: 2px;
+    }
+
+    /* ── Detail table ────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      min-width: 800px;
+    }
+
+    thead th {
+      background: var(--surface2);
+      color: var(--muted);
+      font-weight: 600;
+      text-align: right;
+      padding: 9px 12px;
+      border-bottom: 2px solid var(--border);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    thead th:first-child { text-align: left; }
+
+    tbody td {
+      padding: 8px 12px;
+      text-align: right;
+      border-bottom: 1px solid var(--border2);
+      color: var(--text);
+    }
+
+    tbody td:first-child { text-align: left; font-weight: 500; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface2); }
+
+    .footnote {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      padding: 12px 18px;
+      border-top: 1px solid var(--border2);
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ─────────────────────────── */
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>TFC Membrane Calculator</h1>
+  <span class="sub">Resistance-in-series model · CO₂ / O₂ / N₂</span>
+  <a class="back-link" href="../apps.html">← Apps</a>
+</header>
+
+<div class="layout">
+  <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <!-- Support -->
+      <div class="sec-label"><span class="tag" style="background:#1a4d8f"></span>Porous support — permeance (GPU)</div>
+      <div class="field-header"><span>Layer</span><span>CO₂</span><span>O₂</span><span>N₂</span></div>
+      <div class="field-row">
+        <span class="field-label">Permeance</span>
+        <input id="sup_co2" type="number" step="any" value="180000">
+        <input id="sup_o2"  type="number" step="any" value="210000">
+        <input id="sup_n2"  type="number" step="any" value="220000">
+      </div>
+
+      <!-- Gutter -->
+      <div class="sec-label"><span class="tag" style="background:#217a4b"></span>Gutter layer</div>
+      <div class="field-row single">
+        <span class="field-label">Thickness (nm)</span>
+        <input id="gut_thick" type="number" step="any" value="1000">
+      </div>
+      <div class="field-header"><span>Permeability (Barrer)</span><span>CO₂</span><span>O₂</span><span>N₂</span></div>
+      <div class="field-row">
+        <span class="field-label"></span>
+        <input id="gut_co2" type="number" step="any" value="3250">
+        <input id="gut_o2"  type="number" step="any" value="550">
+        <input id="gut_n2"  type="number" step="any" value="280">
+      </div>
+
+      <!-- Selective -->
+      <div class="sec-label"><span class="tag" style="background:#c0392b"></span>Selective layer</div>
+      <div class="field-row single">
+        <span class="field-label">Thickness (nm)</span>
+        <input id="sel_thick" type="number" step="any" value="200">
+      </div>
+      <div class="field-header"><span>Permeability (Barrer)</span><span>CO₂</span><span>O₂</span><span>N₂</span></div>
+      <div class="field-row">
+        <span class="field-label"></span>
+        <input id="sel_co2" type="number" step="any" value="100">
+        <input id="sel_o2"  type="number" step="any" value="5">
+        <input id="sel_n2"  type="number" step="any" value="2">
+      </div>
+
+      <!-- Protective -->
+      <div class="sec-label"><span class="tag" style="background:#8b5e00"></span>Protective layer</div>
+      <div class="field-row single">
+        <span class="field-label">Thickness (nm)</span>
+        <input id="pro_thick" type="number" step="any" value="100">
+      </div>
+      <div class="field-header"><span>Permeability (Barrer)</span><span>CO₂</span><span>O₂</span><span>N₂</span></div>
+      <div class="field-row">
+        <span class="field-label"></span>
+        <input id="pro_co2" type="number" step="any" value="3250">
+        <input id="pro_o2"  type="number" step="any" value="550">
+        <input id="pro_n2"  type="number" step="any" value="280">
+      </div>
+
+      <!-- Defect -->
+      <div class="sec-label">Defect leakage model</div>
+      <div class="field-row single">
+        <span class="field-label">Defect fraction (f)</span>
+        <input id="defect_frac" type="number" step="any" value="1e-5">
+      </div>
+      <div class="field-row single">
+        <span class="field-label">Sweep min</span>
+        <input id="defect_min" type="number" step="any" value="1e-10">
+      </div>
+      <div class="field-row single">
+        <span class="field-label">Sweep max</span>
+        <input id="defect_max" type="number" step="any" value="1e-2">
+      </div>
+
+      <div class="hint-box">
+        <b>Model:</b> Q<sub>i,total</sub> = (1−f)·Q<sub>i,stack</sub> + f·Q<sub>i,support</sub><br>
+        <b>Layer permeance:</b> Q = 1000·P / l (Barrer → GPU, nm)<br>
+        <b>Stack:</b> 1/Q<sub>stack</sub> = Σ 1/Q<sub>layer</sub>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="recalcBtn">Recalculate</button>
+        <button class="btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════ MAIN ═══════════════════ -->
+  <main class="main">
+
+    <!-- KPI row -->
+    <div class="kpi-row">
+      <div class="kpi highlight">
+        <div class="k-label">CO₂ permeance</div>
+        <div class="k-value" id="out_co2">—</div>
+        <div class="k-unit">GPU</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">O₂ permeance</div>
+        <div class="k-value" id="out_o2">—</div>
+        <div class="k-unit">GPU</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">N₂ permeance</div>
+        <div class="k-value" id="out_n2">—</div>
+        <div class="k-unit">GPU</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">α(CO₂/N₂)</div>
+        <div class="k-value" id="out_a_co2n2">—</div>
+        <div class="k-unit">selectivity</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">α(CO₂/O₂)</div>
+        <div class="k-value" id="out_a_co2o2">—</div>
+        <div class="k-unit">selectivity</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">α(O₂/N₂)</div>
+        <div class="k-value" id="out_a_o2n2">—</div>
+        <div class="k-unit">selectivity</div>
+      </div>
+    </div>
+
+    <!-- Chart 1: Resistance breakdown -->
+    <div class="chart-section">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <h3>Resistance partition — CO₂</h3>
+          <p>Fractional resistance contribution of each layer (stacked bar)</p>
+        </div>
+        <div class="chart-head-right">
+          <div class="legend">
+            <div class="leg-item"><div class="leg-swatch square" style="background:#1a4d8f"></div>Support</div>
+            <div class="leg-item"><div class="leg-swatch square" style="background:#217a4b"></div>Gutter</div>
+            <div class="leg-item"><div class="leg-swatch square" style="background:#c0392b"></div>Selective</div>
+            <div class="leg-item"><div class="leg-swatch square" style="background:#8b5e00"></div>Protective</div>
+          </div>
+          <button class="btn-export" onclick="exportChartWithHeader('resistanceChart','resistanceExportMeta','resistance_partition')">↓ PNG</button>
+        </div>
+      </div>
+      <div class="chart-body" style="position:relative">
+        <div id="resistanceExportMeta" style="display:none"
+             data-title="Resistance partition — CO₂"
+             data-sub="Fractional resistance contribution of each layer"
+             data-legend='[{"color":"#1a4d8f","label":"Support"},{"color":"#217a4b","label":"Gutter"},{"color":"#c0392b","label":"Selective"},{"color":"#8b5e00","label":"Protective"}]'
+             data-swatchtype="square"></div>
+        <canvas id="resistanceChart" class="chart-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Defect sensitivity -->
+    <div class="chart-section">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <h3>Defect sensitivity sweep</h3>
+          <p>CO₂ permeance and α(CO₂/N₂) vs. defect area fraction (log scale)</p>
+        </div>
+        <div class="chart-head-right">
+          <div class="legend">
+            <div class="leg-item"><div class="leg-swatch" style="background:#1a4d8f"></div>CO₂ permeance</div>
+            <div class="leg-item"><div class="leg-swatch" style="background:#c0392b"></div>α(CO₂/N₂)</div>
+          </div>
+          <button class="btn-export" onclick="exportChartWithHeader('defectChart','defectExportMeta','defect_sensitivity')">↓ PNG</button>
+        </div>
+      </div>
+      <div class="chart-body" style="position:relative">
+        <div id="defectExportMeta" style="display:none"
+             data-title="Defect sensitivity sweep"
+             data-sub="CO₂ permeance and α(CO₂/N₂) vs. defect area fraction (log scale)"
+             data-legend='[{"color":"#1a4d8f","label":"CO₂ permeance"},{"color":"#c0392b","label":"α(CO₂/N₂)"}]'
+             data-swatchtype="line"></div>
+        <canvas id="defectChart" class="chart-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Layer permeance dual-axis -->
+    <div class="chart-section">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <h3>Layer permeance — all gases</h3>
+          <p>Left axis: CO₂ (GPU) · Right axis: O₂ and N₂ (GPU) · Support excluded</p>
+        </div>
+        <div class="chart-head-right">
+          <div class="legend">
+            <div class="leg-item"><div class="leg-swatch square" style="background:#1a4d8f"></div>CO₂</div>
+            <div class="leg-item"><div class="leg-swatch square" style="background:#c0392b"></div>O₂</div>
+            <div class="leg-item"><div class="leg-swatch square" style="background:#217a4b"></div>N₂</div>
+          </div>
+          <button class="btn-export" onclick="exportChartWithHeader('permeanceChart','permeanceExportMeta','layer_permeance')">↓ PNG</button>
+        </div>
+      </div>
+      <div class="chart-body" style="position:relative">
+        <div id="permeanceExportMeta" style="display:none"
+             data-title="Layer permeance — all gases"
+             data-sub="Left axis: CO₂ (GPU) · Right axis: O₂ and N₂ (GPU)"
+             data-legend='[{"color":"#1a4d8f","label":"CO₂"},{"color":"#c0392b","label":"O₂"},{"color":"#217a4b","label":"N₂"}]'
+             data-swatchtype="square"></div>
+        <canvas id="permeanceChart" class="chart-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Detail table -->
+    <div class="chart-section">
+      <div class="chart-head">
+        <div class="chart-head-left">
+          <h3>Detailed results table</h3>
+          <p>Per-gas layer permeances and resistance shares</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Gas</th>
+              <th>Q support (GPU)</th>
+              <th>Q gutter (GPU)</th>
+              <th>Q selective (GPU)</th>
+              <th>Q protective (GPU)</th>
+              <th>Q stack (GPU)</th>
+              <th>Q total (GPU)</th>
+              <th>R support</th>
+              <th>R gutter</th>
+              <th>R selective</th>
+              <th>R protective</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+      <div class="footnote">
+        Q(GPU) = 1000 × P(Barrer) / l(nm) &nbsp;·&nbsp;
+        1 / Q<sub>stack</sub> = 1/Q<sub>sup</sub> + 1/Q<sub>gut</sub> + 1/Q<sub>sel</sub> + 1/Q<sub>pro</sub> &nbsp;·&nbsp;
+        Q<sub>total</sub> = (1−f)·Q<sub>stack</sub> + f·Q<sub>sup</sub>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   Constants & helpers
+══════════════════════════════════════════ */
+const COLORS = {
+  support:   '#1a4d8f',
+  gutter:    '#217a4b',
+  selective: '#c0392b',
+  protective:'#8b5e00',
+};
+
+const GASES = ['CO2','O2','N2'];
+const GAS_LABELS = { CO2:'CO₂', O2:'O₂', N2:'N₂' };
+
+const DEFAULTS = {
+  sup_co2:180000, sup_o2:210000, sup_n2:220000,
+  gut_thick:1000, gut_co2:3250, gut_o2:550, gut_n2:280,
+  sel_thick:200,  sel_co2:100,  sel_o2:5,   sel_n2:2,
+  pro_thick:100,  pro_co2:3250, pro_o2:550, pro_n2:280,
+  defect_frac:1e-5, defect_min:1e-10, defect_max:1e-2
+};
+
+const $ = id => document.getElementById(id);
+
+function num(id) {
+  const v = parseFloat($(id).value);
+  return Number.isFinite(v) ? v : 0;
+}
+
+function fmt(x, d=2) {
+  if (!Number.isFinite(x)) return '∞';
+  if (x === 0) return '0';
+  const ax = Math.abs(x);
+  if (ax >= 10000 || ax < 0.01) return x.toExponential(2);
+  return x.toLocaleString(undefined, {maximumFractionDigits: d});
+}
+
+// For table: always plain integer, no sci notation
+function fmtInt(x) {
+  if (!Number.isFinite(x)) return '∞';
+  if (x <= 0) return '0';
+  return Math.round(x).toLocaleString();
+}
+
+function pct(x) {
+  return (100*x).toFixed(1) + '%';
+}
+
+function logspace(min, max, n) {
+  const a = Math.log10(min), b = Math.log10(max), out = [];
+  for (let i=0; i<n; i++) {
+    const t = i/(n-1);
+    out.push(Math.pow(10, a + t*(b-a)));
+  }
+  return out;
+}
+
+// Q = 1000·P/l  (Barrer, nm → GPU).
+// Two distinct degenerate cases, deliberately NOT collapsed:
+//   l ≤ 0 → the layer is absent      → Q = ∞ (contributes no resistance)
+//   P ≤ 0 → the layer is impermeable → Q = 0 (contributes infinite resistance)
+function qFromBarrerNm(P, l) {
+  if (l <= 0) return Infinity;
+  if (P <= 0) return 0;
+  return 1000 * P / l;
+}
+
+/* ══════════════════════════════════════════
+   Model
+══════════════════════════════════════════ */
+function computeModel(defectOverride=null) {
+  const d = {
+    support:   { CO2: num('sup_co2'), O2: num('sup_o2'), N2: num('sup_n2') },
+    gutter:    { thick: num('gut_thick'), CO2: num('gut_co2'), O2: num('gut_o2'), N2: num('gut_n2') },
+    selective: { thick: num('sel_thick'), CO2: num('sel_co2'), O2: num('sel_o2'), N2: num('sel_n2') },
+    protective:{ thick: num('pro_thick'), CO2: num('pro_co2'), O2: num('pro_o2'), N2: num('pro_n2') },
+    f: defectOverride ?? Math.max(0, Math.min(1, num('defect_frac')))
+  };
+
+  const perGas = {};
+  GASES.forEach(g => {
+    const qSup = d.support[g];
+    const qGut = qFromBarrerNm(d.gutter[g],    d.gutter.thick);
+    const qSel = qFromBarrerNm(d.selective[g],  d.selective.thick);
+    const qPro = qFromBarrerNm(d.protective[g], d.protective.thick);
+
+    // Resistance of a layer = 1/Q.  Q = ∞ (absent) → 0;  Q = 0 (impermeable) → ∞.
+    const inv = q => {
+      if (!Number.isFinite(q)) return 0;
+      if (q <= 0) return Infinity;
+      return 1/q;
+    };
+    const r = { support: inv(qSup), gutter: inv(qGut), selective: inv(qSel), protective: inv(qPro) };
+    const rTot = r.support + r.gutter + r.selective + r.protective;
+    const qStack = rTot > 0 ? 1/rTot : Infinity;   // rTot = ∞ → qStack = 0 (blocked)
+    const qTotal = (1 - d.f) * qStack + d.f * qSup;
+
+    // If any layer is impermeable it owns the whole resistance; sharing it out
+    // among the blocking layers keeps the partition finite (∞/∞ would be NaN).
+    const blocking = Object.keys(r).filter(k => !Number.isFinite(r[k]));
+    const shares = {};
+    Object.keys(r).forEach(k => {
+      shares[k] = blocking.length
+        ? (Number.isFinite(r[k]) ? 0 : 1/blocking.length)
+        : (rTot > 0 ? r[k]/rTot : 0);
+    });
+
+    perGas[g] = { qSup, qGut, qSel, qPro, qStack, qTotal, shares };
+  });
+
+  return {
+    perGas,
+    alpha: {
+      co2n2: perGas.CO2.qTotal / perGas.N2.qTotal,
+      co2o2: perGas.CO2.qTotal / perGas.O2.qTotal,
+      o2n2:  perGas.O2.qTotal  / perGas.N2.qTotal,
+    },
+    f: d.f
+  };
+}
+
+/* ══════════════════════════════════════════
+   HiDPI canvas setup
+══════════════════════════════════════════ */
+function setupCanvas(canvas, w, h) {
+  const dpr = window.devicePixelRatio || 2;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w, h, dpr };
+}
+
+/* ══════════════════════════════════════════
+   PNG export — bakes title + legend into image
+══════════════════════════════════════════ */
+function exportChartWithHeader(canvasId, metaId, filename) {
+  const src    = $(canvasId);
+  const meta   = $(metaId);
+  const title  = meta.dataset.title;
+  const sub    = meta.dataset.sub;
+  const legend = JSON.parse(meta.dataset.legend);
+  const swType = meta.dataset.swatchtype; // 'line' or 'square'
+
+  const dpr    = window.devicePixelRatio || 2;
+  const srcW   = src.width;   // already hi-res
+  const srcH   = src.height;
+
+  // header height (logical px, will be scaled)
+  const hdrH   = 56;
+  const legH   = 28;
+  const totalH = srcH + (hdrH + legH) * dpr;
+
+  const tmp = document.createElement('canvas');
+  tmp.width  = srcW;
+  tmp.height = totalH;
+  const tc = tmp.getContext('2d');
+  tc.scale(1, 1); // raw pixel space
+
+  // white background
+  tc.fillStyle = '#ffffff';
+  tc.fillRect(0, 0, tmp.width, tmp.height);
+
+  // top border stripe
+  tc.fillStyle = '#1a4d8f';
+  tc.fillRect(0, 0, tmp.width, 4 * dpr);
+
+  // title
+  tc.font = `${600} ${13 * dpr}px "IBM Plex Mono", monospace`;
+  tc.fillStyle = '#1a1916';
+  tc.textAlign = 'left';
+  tc.textBaseline = 'top';
+  tc.fillText(title, 18 * dpr, 12 * dpr);
+
+  // subtitle
+  tc.font = `${10 * dpr}px "IBM Plex Mono", monospace`;
+  tc.fillStyle = '#7a7870';
+  tc.fillText(sub, 18 * dpr, 30 * dpr);
+
+  // legend row
+  const legY = (hdrH) * dpr;
+  let lx = 18 * dpr;
+  legend.forEach(item => {
+    if (swType === 'square') {
+      tc.fillStyle = item.color;
+      tc.fillRect(lx, legY + 8 * dpr, 10 * dpr, 10 * dpr);
+      lx += 14 * dpr;
+    } else {
+      tc.strokeStyle = item.color;
+      tc.lineWidth = 2.5 * dpr;
+      tc.beginPath();
+      tc.moveTo(lx, legY + 13 * dpr);
+      tc.lineTo(lx + 20 * dpr, legY + 13 * dpr);
+      tc.stroke();
+      lx += 26 * dpr;
+    }
+    tc.font = `${10 * dpr}px "IBM Plex Mono", monospace`;
+    tc.fillStyle = '#7a7870';
+    tc.textBaseline = 'top';
+    tc.fillText(item.label, lx, legY + 7 * dpr);
+    lx += (tc.measureText(item.label).width + 20 * dpr);
+  });
+
+  // chart canvas
+  tc.drawImage(src, 0, (hdrH + legH) * dpr);
+
+  // separator line between header and chart
+  tc.strokeStyle = '#e8e7e2';
+  tc.lineWidth = dpr;
+  tc.beginPath();
+  tc.moveTo(0, (hdrH + legH) * dpr);
+  tc.lineTo(tmp.width, (hdrH + legH) * dpr);
+  tc.stroke();
+
+  const a = document.createElement('a');
+  a.href = tmp.toDataURL('image/png');
+  a.download = filename + '.png';
+  a.click();
+}
+
+/* ══════════════════════════════════════════
+   CHART STYLE HELPERS
+══════════════════════════════════════════ */
+const C = {
+  bg:      '#ffffff',
+  grid:    '#e8e7e2',
+  axis:    '#7a7870',
+  text:    '#1a1916',
+  muted:   '#7a7870',
+  fontMono:'600 11px "IBM Plex Mono", monospace',
+  fontMonoSm:'10px "IBM Plex Mono", monospace',
+};
+
+/* ══════════════════════════════════════════
+   CHART 1: Resistance stacked bar
+══════════════════════════════════════════ */
+function drawResistanceChart(model) {
+  const canvas = $('resistanceChart');
+  const W = canvas.parentElement.clientWidth - 36;
+  const H = 200;
+  const { ctx, w, h } = setupCanvas(canvas, W, H);
+
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, w, h);
+
+  const pad = { l: 52, r: 20, t: 20, b: 50 };
+  const plotW = w - pad.l - pad.r;
+  const plotH = h - pad.t - pad.b;
+
+  const gases = ['CO2','O2','N2'];
+  const layers = ['support','gutter','selective','protective'];
+
+  const barW = Math.min(80, plotW / gases.length * 0.55);
+  const barGap = plotW / gases.length;
+
+  // y-axis label
+  ctx.save();
+  ctx.translate(14, pad.t + plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.font = C.fontMonoSm;
+  ctx.fillStyle = C.muted;
+  ctx.textAlign = 'center';
+  ctx.fillText('Resistance share (%)', 0, 0);
+  ctx.restore();
+
+  // y-axis ticks
+  ctx.font = C.fontMonoSm;
+  ctx.fillStyle = C.muted;
+  ctx.textAlign = 'right';
+  for (let i=0; i<=5; i++) {
+    const y = pad.t + plotH * (1 - i/5);
+    ctx.fillText((i*20)+'%', pad.l - 7, y + 4);
+    ctx.strokeStyle = C.grid;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(w - pad.r, y);
+    ctx.stroke();
+  }
+
+  // axis line
+  ctx.strokeStyle = '#d8d6ce';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, pad.t + plotH);
+  ctx.lineTo(w - pad.r, pad.t + plotH);
+  ctx.stroke();
+
+  // bars
+  gases.forEach((g, gi) => {
+    const cx = pad.l + barGap * (gi + 0.5);
+    const x0 = cx - barW/2;
+    let yBase = pad.t + plotH;
+    const shares = model.perGas[g].shares;
+
+    layers.forEach(layer => {
+      const frac = shares[layer] || 0;
+      const bh = frac * plotH;
+      ctx.fillStyle = COLORS[layer];
+      ctx.fillRect(x0, yBase - bh, barW, bh);
+      // % label if large enough
+      if (bh > 18) {
+        ctx.font = C.fontMonoSm;
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(Math.round(frac*100)+'%', cx, yBase - bh/2 + 4);
+      }
+      yBase -= bh;
+    });
+
+    // gas label below
+    ctx.font = C.fontMono;
+    ctx.fillStyle = C.text;
+    ctx.textAlign = 'center';
+    ctx.fillText(GAS_LABELS[g], cx, h - 14);
+  });
+}
+
+/* ══════════════════════════════════════════
+   Round-number axis helper
+══════════════════════════════════════════ */
+function niceAxis(dataMin, dataMax, nTicks=5) {
+  const range = dataMax - dataMin;
+  if (range === 0) return { min: dataMin - 1, max: dataMax + 1, step: 1, ticks: [] };
+  const rawStep = range / nTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const nicesteps = [1, 2, 2.5, 5, 10];
+  let step = mag * nicesteps.find(s => mag * s >= rawStep) || mag * 10;
+  const axMin = Math.floor(dataMin / step) * step;
+  const axMax = Math.ceil(dataMax  / step) * step;
+  const ticks = [];
+  for (let v = axMin; v <= axMax + step * 0.001; v += step) ticks.push(parseFloat(v.toPrecision(10)));
+  return { min: axMin, max: axMax, step, ticks };
+}
+
+/* ══════════════════════════════════════════
+   CHART 2: Defect sensitivity — round axes
+══════════════════════════════════════════ */
+function drawDefectChart(model) {
+  const canvas = $('defectChart');
+  const W = canvas.parentElement.clientWidth - 36;
+  const H = 300;
+  const { ctx, w, h } = setupCanvas(canvas, W, H);
+
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, w, h);
+
+  let dmin = Math.max(1e-14, num('defect_min'));
+  let dmax = Math.min(1, Math.max(dmin * 10, num('defect_max')));
+
+  const xs = logspace(dmin, dmax, 300);
+  const yPerm = [], ySel = [];
+  xs.forEach(f => {
+    const m = computeModel(f);
+    yPerm.push(m.perGas.CO2.qTotal);
+    ySel.push(m.alpha.co2n2);
+  });
+
+  const ax1 = niceAxis(Math.min(...yPerm), Math.max(...yPerm), 5);
+  const ax2 = niceAxis(Math.min(...ySel),  Math.max(...ySel),  5);
+
+  const pad = { l: 80, r: 72, t: 22, b: 44 };
+  const plotW = w - pad.l - pad.r;
+  const plotH = h - pad.t - pad.b;
+
+  const xP  = x => pad.l + (Math.log10(x) - Math.log10(dmin)) / (Math.log10(dmax) - Math.log10(dmin)) * plotW;
+  const y1P = y => pad.t + (1 - (y - ax1.min) / (ax1.max - ax1.min)) * plotH;
+  const y2P = y => pad.t + (1 - (y - ax2.min) / (ax2.max - ax2.min)) * plotH;
+
+  // horizontal grid lines from left axis ticks
+  ax1.ticks.forEach(v => {
+    const y = y1P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+  });
+
+  // x log ticks
+  const dStartExp = Math.ceil(Math.log10(dmin));
+  const dEndExp   = Math.floor(Math.log10(dmax));
+  ctx.font = C.fontMonoSm;
+  ctx.fillStyle = C.muted;
+  ctx.textAlign = 'center';
+  for (let k = dStartExp; k <= dEndExp; k++) {
+    const px = xP(Math.pow(10, k));
+    if (px < pad.l || px > w - pad.r) continue;
+    ctx.strokeStyle = '#eeede8'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t + plotH); ctx.stroke();
+    // superscript-style label
+    ctx.fillStyle = C.muted;
+    ctx.fillText('10', px - 8, h - 10);
+    ctx.font = '8px "IBM Plex Mono", monospace';
+    ctx.fillText(k, px + 6, h - 16);
+    ctx.font = C.fontMonoSm;
+  }
+
+  // left y-axis ticks (CO2 permeance)
+  ctx.textAlign = 'right';
+  ctx.fillStyle = COLORS.support;
+  ctx.font = C.fontMonoSm;
+  ax1.ticks.forEach(v => {
+    const y = y1P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    ctx.fillText(Math.round(v).toLocaleString(), pad.l - 7, y + 4);
+  });
+
+  // right y-axis ticks (selectivity)
+  ctx.textAlign = 'left';
+  ctx.fillStyle = COLORS.selective;
+  ax2.ticks.forEach(v => {
+    const y = y2P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    // round to sensible precision
+    const label = Number.isInteger(v) ? v.toString() : v.toFixed(1);
+    ctx.fillText(label, w - pad.r + 7, y + 4);
+  });
+
+  // axes
+  ctx.strokeStyle = '#d8d6ce'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + plotH); ctx.lineTo(w - pad.r, pad.t + plotH);
+  ctx.stroke();
+
+  // axis labels
+  ctx.save();
+  ctx.translate(16, pad.t + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.font = C.fontMonoSm;
+  ctx.fillStyle = COLORS.support;
+  ctx.textAlign = 'center';
+  ctx.fillText('CO₂ permeance (GPU)', 0, 0);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(w - 12, pad.t + plotH / 2);
+  ctx.rotate(Math.PI / 2);
+  ctx.font = C.fontMonoSm;
+  ctx.fillStyle = COLORS.selective;
+  ctx.textAlign = 'center';
+  ctx.fillText('α(CO₂/N₂)', 0, 0);
+  ctx.restore();
+
+  // CO2 permeance line
+  ctx.strokeStyle = COLORS.support;
+  ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  xs.forEach((x, i) => {
+    const px = xP(x), py = y1P(yPerm[i]);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // selectivity line
+  ctx.strokeStyle = COLORS.selective;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  xs.forEach((x, i) => {
+    const px = xP(x), py = y2P(ySel[i]);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // current f marker
+  const cf = Math.max(dmin, Math.min(dmax, num('defect_frac')));
+  const cx = xP(cf);
+  ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t + plotH); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = C.fontMonoSm; ctx.fillStyle = C.muted; ctx.textAlign = 'center';
+  ctx.fillText('f = ' + cf.toExponential(1), cx, pad.t - 7);
+
+  // x axis label
+  ctx.fillStyle = C.muted; ctx.textAlign = 'center';
+  ctx.fillText('Defect area fraction f', w / 2, h - 26);
+}
+
+/* ══════════════════════════════════════════
+   CHART 3: Layer permeance — dual Y axis
+   Left: CO₂   Right: O₂ + N₂
+══════════════════════════════════════════ */
+function drawPermeanceChart(model) {
+  const canvas = $('permeanceChart');
+  const W = canvas.parentElement.clientWidth - 36;
+  const H = 280;
+  const { ctx, w, h } = setupCanvas(canvas, W, H);
+
+  ctx.fillStyle = C.bg;
+  ctx.fillRect(0, 0, w, h);
+
+  const layers = ['gutter','selective','protective','stack'];
+  const layerLabels = ['Gutter','Selective','Protective','Stack (ideal)'];
+
+  const layerKey = { gutter:'qGut', selective:'qSel', protective:'qPro', stack:'qStack' };
+
+  // CO2 values
+  const co2vals = layers.map(l => model.perGas.CO2[layerKey[l]]);
+  // O2 and N2
+  const o2vals  = layers.map(l => model.perGas.O2[layerKey[l]]);
+  const n2vals  = layers.map(l => model.perGas.N2[layerKey[l]]);
+
+  const finite = v => Number.isFinite(v) && v > 0;
+  // Guard: every value can be non-finite (all layers absent) or 0 (all blocked);
+  // Math.max() of an empty list is -Infinity, which would poison the axis.
+  const maxOf = (arr, fallback) => {
+    const v = arr.filter(finite);
+    return v.length ? Math.max(...v) : fallback;
+  };
+
+  const ax1 = niceAxis(0, maxOf(co2vals, 1) * 1.1, 5);
+  const ax2 = niceAxis(0, maxOf([...o2vals,...n2vals], 1) * 1.1, 5);
+
+  const pad = { l: 80, r: 80, t: 24, b: 60 };
+  const plotW = w - pad.l - pad.r;
+  const plotH = h - pad.t - pad.b;
+
+  const xP  = i => pad.l + (i + 0.5) * (plotW / layers.length);
+  const y1P = v => pad.t + (1 - (v - ax1.min) / (ax1.max - ax1.min)) * plotH;
+  const y2P = v => pad.t + (1 - (v - ax2.min) / (ax2.max - ax2.min)) * plotH;
+
+  // grid from left axis
+  ax1.ticks.forEach(v => {
+    const y = y1P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+  });
+
+  // axes
+  ctx.strokeStyle = '#d8d6ce'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + plotH);
+  ctx.lineTo(w - pad.r, pad.t + plotH); ctx.lineTo(w - pad.r, pad.t);
+  ctx.stroke();
+
+  // left y ticks (CO2)
+  ctx.textAlign = 'right'; ctx.fillStyle = COLORS.support; ctx.font = C.fontMonoSm;
+  ax1.ticks.forEach(v => {
+    const y = y1P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    ctx.fillText(Math.round(v).toLocaleString(), pad.l - 7, y + 4);
+  });
+
+  // right y ticks (O2/N2)
+  ctx.textAlign = 'left'; ctx.fillStyle = '#555'; ctx.font = C.fontMonoSm;
+  ax2.ticks.forEach(v => {
+    const y = y2P(v);
+    if (y < pad.t - 2 || y > pad.t + plotH + 2) return;
+    ctx.fillText(Math.round(v).toLocaleString(), w - pad.r + 7, y + 4);
+  });
+
+  // axis labels
+  ctx.save(); ctx.translate(16, pad.t + plotH/2); ctx.rotate(-Math.PI/2);
+  ctx.font = C.fontMonoSm; ctx.fillStyle = COLORS.support; ctx.textAlign = 'center';
+  ctx.fillText('CO₂ permeance (GPU)', 0, 0); ctx.restore();
+
+  ctx.save(); ctx.translate(w - 12, pad.t + plotH/2); ctx.rotate(Math.PI/2);
+  ctx.font = C.fontMonoSm; ctx.fillStyle = '#555'; ctx.textAlign = 'center';
+  ctx.fillText('O₂ / N₂ permeance (GPU)', 0, 0); ctx.restore();
+
+  const barW = Math.min(32, plotW / layers.length * 0.22);
+
+  // draw bars per layer group
+  layers.forEach((l, i) => {
+    const cx = xP(i);
+
+    // CO2 bar — left axis
+    if (finite(co2vals[i])) {
+      const bh = Math.max(0, (co2vals[i] - ax1.min) / (ax1.max - ax1.min) * plotH);
+      ctx.fillStyle = COLORS.support;
+      ctx.fillRect(cx - barW * 1.5, pad.t + plotH - bh, barW, bh);
+    }
+    // O2 bar — right axis
+    if (finite(o2vals[i])) {
+      const bh = Math.max(0, (o2vals[i] - ax2.min) / (ax2.max - ax2.min) * plotH);
+      ctx.fillStyle = COLORS.selective;
+      ctx.fillRect(cx - barW * 0.3, pad.t + plotH - bh, barW, bh);
+    }
+    // N2 bar — right axis
+    if (finite(n2vals[i])) {
+      const bh = Math.max(0, (n2vals[i] - ax2.min) / (ax2.max - ax2.min) * plotH);
+      ctx.fillStyle = COLORS.gutter;
+      ctx.fillRect(cx + barW * 0.9, pad.t + plotH - bh, barW, bh);
+    }
+
+    // x label
+    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.fillStyle = C.muted; ctx.textAlign = 'center';
+    ctx.fillText(layerLabels[i], cx, h - 8);
+  });
+}
+
+/* ══════════════════════════════════════════
+   Update KPIs & table
+══════════════════════════════════════════ */
+function updateOutputs(model) {
+  $('out_co2').textContent   = fmt(model.perGas.CO2.qTotal, 0);
+  $('out_o2').textContent    = fmt(model.perGas.O2.qTotal,  0);
+  $('out_n2').textContent    = fmt(model.perGas.N2.qTotal,  0);
+  $('out_a_co2n2').textContent = fmt(model.alpha.co2n2, 2);
+  $('out_a_co2o2').textContent = fmt(model.alpha.co2o2, 2);
+  $('out_a_o2n2').textContent  = fmt(model.alpha.o2n2,  2);
+
+  $('detailBody').innerHTML = GASES.map(g => {
+    const d = model.perGas[g];
+    return `<tr>
+      <td>${GAS_LABELS[g]}</td>
+      <td>${fmtInt(d.qSup)}</td>
+      <td>${fmtInt(d.qGut)}</td>
+      <td>${fmtInt(d.qSel)}</td>
+      <td>${fmtInt(d.qPro)}</td>
+      <td>${fmtInt(d.qStack)}</td>
+      <td>${fmtInt(d.qTotal)}</td>
+      <td>${pct(d.shares.support)}</td>
+      <td>${pct(d.shares.gutter)}</td>
+      <td>${pct(d.shares.selective)}</td>
+      <td>${pct(d.shares.protective)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   Main recalc
+══════════════════════════════════════════ */
+function recalc() {
+  const model = computeModel();
+  updateOutputs(model);
+  drawResistanceChart(model);
+  drawDefectChart(model);
+  drawPermeanceChart(model);
+}
+
+function resetDefaults() {
+  Object.entries(DEFAULTS).forEach(([k, v]) => { if ($(k)) $(k).value = v; });
+  recalc();
+}
+
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+$('recalcBtn').addEventListener('click', recalc);
+$('resetBtn').addEventListener('click', resetDefaults);
+
+window.addEventListener('resize', recalc);
+recalc();
+</script>
+</body>
+</html>

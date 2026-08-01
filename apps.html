@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roman Selyanchyn — Apps</title>
+<meta name="description" content="Small interactive web apps and visualizations by Roman Selyanchyn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="program-mark">
+      <a class="pm-name" href="index.html">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Roman Selyanchyn</span>
+      </a>
+      <small>
+        <span class="pm-sep" aria-hidden="true">/</span>
+        <a href="https://q-pit.kyushu-u.ac.jp/" target="_blank" rel="noopener">Q-PIT</a>
+        <span class="pm-sep" aria-hidden="true">/</span>
+        <a href="https://www.kyushu-u.ac.jp/en/" target="_blank" rel="noopener">Kyushu University</a>
+      </small>
+    </div>
+    <nav class="landing-nav" id="site-nav">
+      <a href="index.html#about">About</a>
+      <a href="index.html#research">Research</a>
+      <a href="index.html#coordination">Coordination</a>
+      <a href="index.html#experience">Experience</a>
+      <a href="index.html#education">Education</a>
+      <a href="publications.html">Publications</a>
+      <a href="apps.html">Apps</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <button type="button" class="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="site-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+<main>
+  <section class="hero" style="grid-template-columns:1fr;padding-bottom:0">
+    <div class="hero-copy">
+      <p class="eyebrow">Apps</p>
+      <h1>Apps</h1>
+      <p class="hero-role">Small interactive web apps and visualizations — quick tools and experiments, several built with AI assistance.</p>
+      <div class="hero-links">
+        <a class="chip-link" href="index.html">&larr; Back to CV</a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="apps-grid">
+      <a class="app-card" href="climate-plot/">
+        <h3 class="app-title">Daily Sea Surface Temperature — layer builder</h3>
+        <p class="app-blurb">Redraws the daily global SST chart (NOAA OISST v2.1 via Climate Reanalyzer) and lets you toggle individual years on and off, exporting each state as aligned SVG or PNG layers for building reveal-one-year-at-a-time slides.</p>
+        <div class="app-tags"><span class="tag">Climate</span><span class="tag">Data viz</span><span class="tag">Figure export</span></div>
+        <span class="app-open">Open &rarr;</span>
+      </a>
+      <a class="app-card" href="concentration-polarization/">
+        <h3 class="app-title">Concentration Polarization — plate-and-frame module</h3>
+        <p class="app-blurb">Interactive 1-D module model: the Wijmans–Baker film model integrated along a slit channel, with a mass-conserving particle animation, co- vs counter-current comparison, and an overlay for your own measured data.</p>
+        <div class="app-tags"><span class="tag">Membranes</span><span class="tag">Mass transfer</span><span class="tag">Simulation</span></div>
+        <span class="app-open">Open &rarr;</span>
+      </a>
+      <a class="app-card" href="tfcm-calculator/">
+        <h3 class="app-title">TFC Membrane Calculator</h3>
+        <p class="app-blurb">Resistance-in-series model for thin-film composite gas-separation membranes: layer permeances, resistance partition and defect-leakage sensitivity for CO₂, O₂ and N₂.</p>
+        <div class="app-tags"><span class="tag">Membranes</span><span class="tag">Gas separation</span><span class="tag">Calculator</span></div>
+        <span class="app-open">Open &rarr;</span>
+      </a>
+      <a class="app-card" href="mirai-energy-sankey/">
+        <h3 class="app-title">Energy Flow Sankey Diagrams — Sweden &amp; Japan (2023)</h3>
+        <p class="app-blurb">Interactive LLNL-style energy-flow (Sankey) diagrams for Sweden and Japan, verified against Eurostat and METI official statistics.</p>
+        <div class="app-tags"><span class="tag">Data viz</span><span class="tag">Energy</span></div>
+        <span class="app-open">Open &rarr;</span>
+      </a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+    <span>&copy; 2026 Roman Selyanchyn</span>
+    <span><a href="https://orcid.org/0000-0002-0846-2416">ORCID</a> &middot; <a href="https://scholar.google.com/citations?user=_ry05noAAAAJ&hl=en">Google Scholar</a> &middot; <a href="https://researchmap.jp/romanselyanchyn">researchmap</a></span>
+</footer>
+<script>
+(function(){
+  var btn=document.querySelector('.menu-btn'),nav=document.getElementById('site-nav');
+  if(btn&&nav){btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){
+    nav.classList.remove('open');btn.setAttribute('aria-expanded','false');});});}
+  // Scrollspy: highlight the nav link for the section in view (in-page anchors only).
+  var secs=[].slice.call(document.querySelectorAll('main section[id]'));
+  var map={};nav&&nav.querySelectorAll('a').forEach(function(a){
+    var h=a.getAttribute('href')||'';var i=h.indexOf('#');
+    if(i>=0&&(h.indexOf('index.html')===0||h[0]==='#'))map[h.slice(i+1)]=a;});
+  if(secs.length&&Object.keys(map).length&&'IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){Object.values(map).forEach(function(a){a.classList.remove('active');});
+        var a=map[e.target.id];if(a)a.classList.add('active');}});},
+      {rootMargin:'-45% 0px -50% 0px'});
+    secs.forEach(function(s){obs.observe(s);});}
+})();
+</script>
+</body>
+</html>

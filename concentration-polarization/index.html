@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concentration polarization — plate-and-frame membrane module</title>
+<style>
+  :root{
+    --bg:#f4f3ef; --card:#fff; --bd:#e0ded6; --ink:#2c2c2a; --sub:#5f5e5a;
+    --co2:#E24B4A; --n2:#7F77DD; --o2:#639922; --accent:#b07a2c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);}
+  .card{max-width:1040px;margin:28px auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 30px 22px;}
+  a.back-link{display:inline-block;font-size:12px;font-weight:600;text-decoration:none;
+    color:var(--sub);background:#f1efe9;border:1px solid var(--bd);border-radius:7px;
+    padding:5px 12px;margin-bottom:14px;transition:all .15s;}
+  a.back-link:hover{background:#e9e7df;color:var(--ink);}
+  h1{font-size:22px;font-weight:600;margin:0 0 6px;}
+  p.sub{font-size:14px;color:var(--sub);margin:0 0 16px;line-height:1.55;}
+  p.sub em{color:var(--ink);font-style:normal;border-bottom:1px dotted #bbb;}
+
+  .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px 24px;
+    background:#faf9f6;border:1px solid var(--bd);border-radius:10px;padding:15px 20px;margin-bottom:14px;}
+  .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--sub);margin-bottom:5px;}
+  .ctl label b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;}
+  .ctl input[type=range]{width:100%;accent-color:var(--accent);margin:0;cursor:pointer;}
+  .ctl .hint{font-size:10.5px;color:#9a988f;margin-top:3px;line-height:1.35;}
+  input.qnum{width:72px;border:1px solid var(--bd);border-radius:5px;padding:1px 4px;
+    font:inherit;font-size:13px;font-weight:600;color:var(--ink);text-align:right;background:#fff;}
+  input.qnum:focus{outline:1.5px solid var(--accent);}
+  select.qsel{font:inherit;font-size:11px;border:1px solid var(--bd);border-radius:5px;
+    background:#fff;color:var(--ink);padding:1px 2px;cursor:pointer;}
+  .ctl.geo label b{color:#7a6a48;}
+
+  .flowrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;font-size:13px;color:var(--sub);}
+  .seg{display:inline-flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;}
+  .seg button{border:none;background:#fff;color:var(--sub);font-size:13px;padding:6px 14px;cursor:pointer;}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600;}
+  button.reset{font-size:12px;color:var(--sub);background:#f1efe9;border:1px solid var(--bd);border-radius:7px;padding:6px 12px;cursor:pointer;margin-left:auto;}
+  button.reset:hover{background:#e9e7df;}
+
+  .stage{display:grid;grid-template-columns:1fr 312px;gap:20px;align-items:start;}
+  @media(max-width:780px){.stage{grid-template-columns:1fr;}}
+  canvas{width:100%;height:auto;display:block;border-radius:8px;}
+  .legend{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+
+  .panel{font-size:13px;}
+  .verdict{border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.45;border:1px solid;}
+  .grp{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#9a988f;margin:14px 0 2px;font-weight:600;}
+  .readrow{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid #efede7;}
+  .readrow:last-child{border-bottom:none;}
+  .readrow .k{color:var(--sub);}
+  .readrow .k small{font-size:11px;color:#a6a49b;}
+  .readrow .v{font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;text-align:right;}
+  .readrow .v small{font-weight:400;color:var(--sub);font-size:11px;}
+  .bar{height:7px;border-radius:4px;background:#eceae3;overflow:hidden;margin:8px 0 2px;}
+  .bar>span{display:block;height:100%;border-radius:4px;}
+
+  .profhead{font-size:13px;font-weight:600;margin:2px 0 1px;}
+  .profsub{font-size:11px;color:var(--sub);margin:0 0 5px;}
+
+  p.cap{font-size:12.5px;color:var(--sub);margin:18px 0 0;line-height:1.6;}
+  p.cap b{color:var(--ink);}
+  details{margin-top:12px;font-size:12.5px;color:var(--sub);}
+  summary{cursor:pointer;font-weight:600;color:var(--ink);}
+  details code{background:#f1efe9;padding:1px 5px;border-radius:4px;font-size:12px;}
+  details .eq{display:block;margin:8px 0;padding:8px 12px;background:#faf9f6;border-left:3px solid var(--accent);border-radius:4px;font-size:12.5px;}
+  .ref{font-size:11.5px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <a class="back-link" href="../apps.html">&larr; Apps</a>
+  <h1>Concentration polarization — plate-and-frame membrane module</h1>
+  <p class="sub">A 1-D model of a plate-and-frame module: feed flows <em>along</em> a slit with the membrane on one wall and an impermeable plastic filler on the other. CO&#8322; permeates faster than the feed can resupply it, so a <em>CO&#8322;-starved boundary layer</em> forms (concentration polarization), <em>and</em> the retentate is progressively depleted down the channel. The model integrates the Wijmans–Baker film model cell-by-cell along the length and lets you compare <em>co-current</em> against counter-current. Every molecule in the animation is conserved — a CO&#8322; that leaves the feed is the same one that enters the permeate.</p>
+
+  <div class="controls" id="controls">
+    <div class="ctl">
+      <label>Feed pressure <b><input type="number" class="qnum" id="pf_n" value="5.0" min="1" max="20" step="any" style="width:54px"> bar</b></label>
+      <input type="range" id="pf" min="1" max="20" step="0.5" value="5">
+      <div class="hint">Higher pressure → larger driving force &amp; flux.</div>
+    </div>
+    <div class="ctl">
+      <label>Feed N&#8322; <b><input type="number" class="qnum" id="n2_n" value="25" min="0" max="99" step="any" style="width:54px">%</b></label>
+      <input type="range" id="n2" min="0" max="99" step="0.5" value="25">
+      <div class="hint">Set N&#8322; and O&#8322;; CO&#8322; is the balance. O&#8322; = 0 → binary CO&#8322;/N&#8322;.</div>
+    </div>
+    <div class="ctl">
+      <label>Feed O&#8322; <b><input type="number" class="qnum" id="o2_n" value="7" min="0" max="99" step="any" style="width:54px">%</b></label>
+      <input type="range" id="o2" min="0" max="99" step="0.5" value="7">
+      <div class="hint">Feed CO&#8322; (balance): <b style="color:var(--co2)"><span id="v_co2">68</span>%</b></div>
+    </div>
+    <div class="ctl">
+      <label>Feed flow rate <b><input type="number" class="qnum" id="flow_n" value="0.50" min="0.03" max="15.8" step="any" style="width:58px"> <select class="qsel" id="flowref"><option value="std">NL/min</option><option value="act">L/min act.</option></select></b></label>
+      <input type="range" id="flow" min="-1.5" max="1.2" step="0.01" value="-0.301">
+      <div class="hint">NL/min = standard (typical MFC reading). Velocity in channel: <b><span id="v_u">0.03</span> m/s</b>.</div>
+    </div>
+    <div class="ctl">
+      <label>CO&#8322; permeance <b><input type="number" class="qnum" id="qco2_n" value="1000" min="0.01" step="any"> GPU</b></label>
+      <input type="range" id="qco2" min="0.7" max="4.3" step="0.02" value="3">
+      <div class="hint">Slide or type an exact value. Polymers ~50–500; facilitated / MOF &gt;5000.</div>
+    </div>
+    <div class="ctl">
+      <label>N&#8322; permeance <b><input type="number" class="qnum" id="qn2_n" value="25" min="0.01" step="any"> GPU</b></label>
+      <input type="range" id="qn2" min="-1" max="3.3" step="0.02" value="1.4">
+      <div class="hint">Usually the slowest gas — sets CO&#8322;/N&#8322; selectivity.</div>
+    </div>
+    <div class="ctl">
+      <label>O&#8322; permeance <b><input type="number" class="qnum" id="qo2_n" value="75" min="0.01" step="any"> GPU</b></label>
+      <input type="range" id="qo2" min="-1" max="3.3" step="0.02" value="1.875">
+      <div class="hint">Typically ~2–4× N&#8322; in polymers.</div>
+    </div>
+    <div class="ctl">
+      <label>Selectivities <b style="color:#9a988f;font-weight:500">computed</b></label>
+      <div style="font-size:13px;color:var(--ink);padding:4px 0;font-variant-numeric:tabular-nums">
+        CO&#8322;/N&#8322; <b id="s_cn">40</b> &nbsp;·&nbsp; CO&#8322;/O&#8322; <b id="s_co">13</b> &nbsp;·&nbsp; O&#8322;/N&#8322; <b id="s_on">3.0</b>
+      </div>
+      <div class="hint">Ratios of the permeances above — change those to change these.</div>
+    </div>
+    <div class="ctl">
+      <label>Permeate pressure <b><input type="number" class="qnum" id="pp_n" value="1.0" min="0.1" max="3" step="any" style="width:54px"> bar</b></label>
+      <input type="range" id="pp" min="0.1" max="3" step="0.1" value="1">
+      <div class="hint">Lower (vacuum) → bigger pressure ratio &amp; flux.</div>
+    </div>
+    <div class="ctl geo">
+      <label>Slit gap <b><input type="number" class="qnum" id="gap_n" value="2.0" min="0.5" max="5" step="any" style="width:54px"> mm</b></label>
+      <input type="range" id="gap" min="0.5" max="5" step="0.1" value="2">
+      <div class="hint">Wider → thicker boundary layer, lower velocity.</div>
+    </div>
+    <div class="ctl geo">
+      <label>Channel width <b><input type="number" class="qnum" id="W_n" value="30" min="5" max="120" step="any" style="width:54px"> mm</b></label>
+      <input type="range" id="W" min="5" max="120" step="1" value="30">
+      <div class="hint">With gap, sets cross-section &amp; membrane area.</div>
+    </div>
+    <div class="ctl geo">
+      <label>Channel length <b><input type="number" class="qnum" id="L_n" value="0.15" min="0.05" max="0.6" step="any" style="width:58px"> m</b></label>
+      <input type="range" id="L" min="0.05" max="0.6" step="0.01" value="0.15">
+      <div class="hint">Longer → higher recovery.</div>
+    </div>
+    <div class="ctl geo">
+      <label>Active membrane area <b><input type="number" class="qnum" id="Am_n" value="30" min="1" max="500" step="any" style="width:54px"> cm²</b></label>
+      <input type="range" id="Am" min="1" max="100" step="1" value="30">
+      <div class="hint">Channel wall is <b><span id="v_Achan">45</span> cm²</b>; gaskets/sealing reduce the flux area. Hydrodynamics still use the full channel.</div>
+    </div>
+    <div class="ctl geo">
+      <label>Temperature <b><input type="number" class="qnum" id="T_n" value="25" min="10" max="80" step="any" style="width:48px"> °C</b></label>
+      <input type="range" id="T" min="10" max="80" step="1" value="25">
+      <div class="hint">Sets gas diffusivity &amp; density.</div>
+    </div>
+  </div>
+
+  <div class="flowrow">
+    <span>Flow configuration:</span>
+    <div class="seg" id="modeSeg">
+      <button data-mode="co" class="on">Co-current</button>
+      <button data-mode="counter">Counter-current</button>
+    </div>
+    <button class="reset" id="reset">Reset defaults</button>
+  </div>
+
+  <div>
+    <canvas id="scene" width="980" height="300"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--co2)"></i>CO&#8322; (fast)</span>
+      <span><i class="dot" style="background:var(--n2)"></i>N&#8322; (slow)</span>
+      <span><i class="dot" style="background:var(--o2)"></i>O&#8322; (slow)</span>
+      <span style="color:#a6a49b">particles conserved across the membrane</span>
+      <button class="reset" id="pause" style="margin-left:auto">&#10074;&#10074; Pause</button>
+    </div>
+  </div>
+
+  <div class="stage" style="margin-top:16px">
+    <div>
+      <div class="profhead">CO&#8322; along the module</div>
+      <p class="profsub">Mole fraction vs position. Gap between retentate (bulk) and surface = polarization. Hollow circles = your measured values.</p>
+      <canvas id="prof" width="640" height="170"></canvas>
+
+      <div class="profhead" style="margin-top:16px">Experiment vs model</div>
+      <p class="profsub">Solid bars = model at the current settings; hollow bars = your measurements (enter them in the panel &#8594;).</p>
+      <canvas id="cmp" width="640" height="160"></canvas>
+    </div>
+
+    <div class="panel">
+      <div class="verdict" id="verdict"></div>
+
+      <div class="grp">Module output</div>
+      <div class="readrow"><span class="k">Product CO&#8322; purity</span><span class="v" id="r_pur">—</span></div>
+      <div class="readrow"><span class="k">CO&#8322; recovery</span><span class="v" id="r_rec">—</span></div>
+      <div class="readrow"><span class="k">Stage cut θ <small>(permeated/fed)</small></span><span class="v" id="r_cut">—</span></div>
+      <div class="readrow"><span class="k">Retentate CO&#8322;</span><span class="v" id="r_ret">—</span></div>
+      <div class="readrow"><span class="k">CO&#8322; flux <small>(inlet)</small></span><span class="v" id="r_flux">—</span></div>
+      <div class="readrow"><span class="k">Molar feed <small>· active area</small></span><span class="v" id="r_feedarea">—</span></div>
+
+      <div class="grp">Experiment vs model <span style="text-transform:none;letter-spacing:0">— type your measured CO&#8322;</span></div>
+      <div class="readrow"><span class="k">Permeate CO&#8322; <small>measured</small></span><span class="v"><input type="number" class="qnum" id="exp_p" min="0" max="100" step="any" style="width:58px" placeholder="–"> %</span></div>
+      <div class="readrow"><span class="k" style="font-size:12px">&nbsp;&nbsp;&#8627; model · Δ</span><span class="v" id="r_expp">—</span></div>
+      <div class="readrow"><span class="k">Retentate CO&#8322; <small>measured</small></span><span class="v"><input type="number" class="qnum" id="exp_r" min="0" max="100" step="any" style="width:58px" placeholder="–"> %</span></div>
+      <div class="readrow"><span class="k" style="font-size:12px">&nbsp;&nbsp;&#8627; model · Δ</span><span class="v" id="r_expr">—</span></div>
+      <div style="text-align:right;margin-top:5px"><button class="reset" id="exp_clear" style="font-size:11px;padding:2px 9px">clear</button></div>
+
+      <div class="grp">Concentration polarization (inlet)</div>
+      <div class="readrow"><span class="k">Polarization modulus</span><span class="v" id="r_mod">—</span></div>
+      <div class="bar"><span id="b_mod"></span></div>
+      <div class="readrow"><span class="k">Péclet number J<sub>v</sub>/k</span><span class="v" id="r_pe">—</span></div>
+      <div class="readrow"><span class="k">Surface CO&#8322; <small>vs bulk</small></span><span class="v" id="r_surf">—</span></div>
+      <div class="readrow"><span class="k">k <small>· flow regime</small></span><span class="v" id="r_k">—</span></div>
+
+      <div class="grp">What polarization &amp; flow cost you</div>
+      <div class="readrow"><span class="k">Product purity, ideal (no CP)</span><span class="v" id="r_purideal">—</span></div>
+      <div class="readrow"><span class="k">Same module, other config</span><span class="v" id="r_alt">—</span></div>
+    </div>
+  </div>
+
+  <p class="cap"><b>Reading it.</b> Red = CO&#8322; (fast), purple = N&#8322;, green = O&#8322; (slow). Two losses stack up, and they respond to different knobs.<br>
+  <b>1 · Polarization.</b> The membrane only &#8220;sees&#8221; the depleted <em>surface</em> — the bulk–surface gap in the plot. It worsens with high permeance, high pressure and a <em>wider gap</em>. In this one-sided slit the laminar flow sits on its fully-developed limit (Sh &#8776; 4.86), so k &#8776; 4.86·D/(2·gap): <b>the cure here is the gap, not the feed rate</b> — halving the gap doubles k, while raising the flow barely moves it. Not a better membrane, either: a faster material only deepens the boundary layer.<br>
+  <b>2 · Axial depletion.</b> The retentate loses CO&#8322; down the channel, and in <b>co-current</b> the permeate enriches alongside the feed so the driving force collapses toward the outlet — counter-current keeps a larger average driving force and usually wins. <em>This</em> loss is the flow-sensitive one: a faster feed cuts the stage cut and keeps the retentate rich.</p>
+
+  <details>
+    <summary>The model &amp; references</summary>
+    <p style="margin-top:10px">A 1-D plate-and-frame module discretised into cells along the length. In each cell the feed-side film model (Wijmans, Athayde &amp; Baker) is solved with the local solution–diffusion flux, then feed and permeate molar flows are marched along the channel (forward for co-current; iterated as a two-point problem for counter-current). For each species <code>i</code>:</p>
+    <span class="eq">Flux:&nbsp; J<sub>i</sub> = Q<sub>i</sub> ( p<sub>f</sub>·x<sub>i,surface</sub> − p<sub>p</sub>·y<sub>i,permeate</sub> )</span>
+    <span class="eq">Film:&nbsp; ( x<sub>i,surf</sub> − J<sub>i</sub>/J<sub>v</sub> ) / ( x<sub>i,bulk</sub> − J<sub>i</sub>/J<sub>v</sub> ) = exp( J<sub>v</sub> / (c<sub>tot</sub>·k<sub>i</sub>) )</span>
+    <p>The mass-transfer coefficient <code>k</code> comes from a slit-channel Sherwood correlation with <b>one active wall</b> (membrane) and one inert wall (the plastic filler): fully-developed laminar limit <code>Sh ≈ 4.86</code> on hydraulic diameter <code>d<sub>h</sub> = 2·gap</code>, blended with the Lévêque entrance solution, and a turbulent branch for <code>Re &gt; 2300</code>.
+    <b>Regime note:</b> with gases (<code>Sc &#8776; 1</code>) in a millimetre slit the fully-developed floor dominates over practically the whole slider range — Lévêque only takes over above <code>Re·Sc·d<sub>h</sub>/L &#8776; 27</code>, and <code>Re</code> stays below ~1300 at 5 bar, so the turbulent branch is never reached. Hence <code>k</code> is set by the gap and is nearly independent of feed velocity here. A different channel geometry, a feed spacer or a turbulence promoter would change that, and would need its own correlation. Gas diffusivity and viscosity scale as <code>T<sup>1.7</sup>/p</code>. The flow reading is converted to a molar feed rate (NL/min assumes 0&nbsp;°C, 1&nbsp;atm — the usual MFC reference; &#8220;actual&#8221; takes the volume at feed p,T), and the corresponding actual volumetric flow through the <code>width × gap</code> cross-section sets the channel velocity that drives <code>k</code>. The <b>active membrane area</b> can be smaller than the channel wall (<code>length × width</code>) to account for gaskets/sealing: flux acts only on that fraction of each cell while the hydrodynamics keep the full channel. Each species' permeance (CO&#8322;, N&#8322;, O&#8322;) is set independently — type measured values directly — and the selectivities shown are simply their ratios. Defaults (1000 / 25 / 75 GPU) are illustrative.</p>
+    <p class="ref"><b>Sources:</b> Wijmans, Athayde, Daniels, Ly, Kamaruddin (1996) <i>J. Membr. Sci.</i> 109:135 (film model). R.W. Baker, <i>Membrane Technology and Applications</i> (Wiley), ch. 4–5. One-wall slit Sherwood asymptote: Shah &amp; London, <i>Laminar Flow Forced Convection in Ducts</i>. Recent CP-in-gas-separation impact studies: high-performance zeolite membranes (Membranes/MDPI 2024); biogas upgrading (Chem. Eng. Res. Des. 2024).</p>
+  </details>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const COL=["#E24B4A","#7F77DD","#639922"];      // CO2, N2, O2
+const GPU=3.346e-10;                             // mol m^-2 s^-1 Pa^-1
+let MODE="co";
+
+
+// ---------- transport properties ----------
+function props(Tc,pfBar){
+  const Tk=273.15+Tc, RT=8.314*Tk, fT=Math.pow(Tk/298.15,1.7);
+  const D=[1.6e-5,1.7e-5,1.9e-5].map(d=>d*fT/pfBar);   // m^2/s, ~T^1.7/p
+  const nu=1.55e-5*fT/pfBar;                            // kinematic visc
+  return {RT,D,nu};
+}
+function kcoef(u,gap_m,L_m,D,nu){
+  const dh=2*gap_m, Re=u*dh/nu;                        // slit: dh = 2*gap
+  const ki=D.map(Di=>{
+    const Sc=nu/Di; let Sh;
+    if(Re<2300) Sh=Math.max(4.86, 1.62*Math.pow(Re*Sc*dh/L_m,1/3));  // one active wall
+    else        Sh=0.023*Math.pow(Re,0.8)*Math.pow(Sc,1/3);
+    return Sh*Di/dh;
+  });
+  return {ki,Re};
+}
+
+// ---------- one cell: flux given feed-bulk & permeate-bulk composition ----------
+function cellFlux(xb,yp,pf,pp,ctot,ki,Q){
+  // No driving force even at the bulk (most favourable) composition — e.g. the
+  // permeate pressure is at or above the feed. Nothing to solve.
+  const J0=[0,0,0];
+  for(let i=0;i<3;i++) J0[i]=Q[i]*(pf*xb[i]-pp*yp[i]);
+  const Jv0=J0[0]+J0[1]+J0[2];
+  if(Jv0<=1e-13) return {J:J0, xs:xb.slice(), Jv:Math.max(Jv0,0)};
+
+  // Fixed-point iteration on the surface composition. At high Péclet the map is
+  // stiff and can overshoot into Jv<=0; back off toward the bulk and keep going
+  // rather than bailing out — bailing out used to reset xs to the bulk, i.e.
+  // report "no polarization" precisely when polarization is most severe.
+  let xs=xb.slice(), J=J0.slice(), Jv=Jv0;
+  for(let it=0;it<500;it++){
+    for(let i=0;i<3;i++) J[i]=Q[i]*(pf*xs[i]-pp*yp[i]);
+    Jv=J[0]+J[1]+J[2];
+    if(Jv<=1e-13){ for(let i=0;i<3;i++) xs[i]+=0.5*(xb[i]-xs[i]); continue; }
+    const v=Jv/ctot; let sum=0,xn=[0,0,0];
+    for(let i=0;i<3;i++){
+      const comp=J[i]/Jv;
+      let val=comp+(xb[i]-comp)*Math.exp(v/ki[i]);
+      val=Math.min(Math.max(val,1e-5),1); xn[i]=val; sum+=val;
+    }
+    // damp harder as the Péclet number rises — the exp() makes the map stiff, and
+    // a fixed 0.6 step oscillated instead of converging under severe polarization
+    const w=0.35/(1+v/ki[0]);
+    let dmax=0;
+    for(let i=0;i<3;i++){
+      const tgt=xn[i]/sum;
+      dmax=Math.max(dmax,Math.abs(tgt-xs[i]));
+      xs[i]=xs[i]+w*(tgt-xs[i]);
+    }
+    if(dmax<1e-11) break;
+  }
+  // flux consistent with the converged surface composition
+  for(let i=0;i<3;i++) J[i]=Q[i]*(pf*xs[i]-pp*yp[i]);
+  Jv=J[0]+J[1]+J[2];
+  return {J,xs,Jv};
+}
+
+// ---------- full module ----------
+function runModule(p,mode,noCP){
+  const {RT,D,nu}=props(p.T,p.pf);
+  const ctot=p.pf*1e5/RT, pf=p.pf*1e5, pp=p.pp*1e5;
+  let {ki,Re}=kcoef(p.u,p.gap/1e3,p.L,D,nu);
+  if(noCP) ki=[1e9,1e9,1e9];
+  const Q=[p.qco2*GPU, p.qn2*GPU, p.qo2*GPU];
+
+  const w=p.W/1e3, gap=p.gap/1e3;
+  const Qfeed=p.u*gap*w, Fin=Qfeed*ctot;               // mol/s
+  const xb0=[Math.max(1-(p.n2+p.o2)/100,0.005), p.n2/100, p.o2/100];
+  const Fin_i=xb0.map(x=>Fin*x);
+  // active membrane area can be smaller than the channel wall (sealed edges):
+  // flux acts on Afrac of each cell, hydrodynamics keep the full channel
+  const Afrac=Math.min(1,(p.Am/1e4)/(w*p.L));
+  const N=60, dz=p.L/N, dA=w*dz*Afrac;
+
+  // permeate composition profile per cell (mixing-cup), iterated for both modes
+  let yprof=Array.from({length:N},()=>xb0.slice());
+  let cells=null, prodFlow=[0,0,0];
+  const sweeps = mode==="counter"?45:6;
+  for(let s=0;s<sweeps;s++){
+    // forward feed march. dN = moles actually permeated per cell, capped at what
+    // the feed still carries → exact conservation, recovery can never exceed 1.
+    let f=Fin_i.slice(); cells=[];
+    for(let k=0;k<N;k++){
+      const Ft=f[0]+f[1]+f[2];
+      const xb=Ft>1e-14?[f[0]/Ft,f[1]/Ft,f[2]/Ft]:xb0.slice();
+      const c=cellFlux(xb,yprof[k],pf,pp,ctot,ki,Q);
+      const dN=[0,0,0];
+      for(let i=0;i<3;i++){ dN[i]=Math.min(c.J[i]*dA,Math.max(f[i],0)); f[i]=Math.max(f[i]-dN[i],0); }
+      cells.push({xb,xs:c.xs,J:c.J,Jv:c.Jv,dN});
+    }
+    // permeate march → updates yprof (relaxed)
+    let pacc=[0,0,0];
+    if(mode==="counter"){
+      for(let k=N-1;k>=0;k--){
+        for(let i=0;i<3;i++) pacc[i]=Math.max(pacc[i]+cells[k].dN[i],0);
+        const Pt=pacc[0]+pacc[1]+pacc[2];
+        const y=Pt>0?[pacc[0]/Pt,pacc[1]/Pt,pacc[2]/Pt]:cells[k].xb;
+        for(let i=0;i<3;i++) yprof[k][i]+=0.5*(y[i]-yprof[k][i]);
+      }
+    }else{
+      for(let k=0;k<N;k++){
+        for(let i=0;i<3;i++) pacc[i]=Math.max(pacc[i]+cells[k].dN[i],0);
+        const Pt=pacc[0]+pacc[1]+pacc[2];
+        const y=Pt>0?[pacc[0]/Pt,pacc[1]/Pt,pacc[2]/Pt]:cells[k].xb;
+        const idx=Math.min(k+1,N-1);
+        for(let i=0;i<3;i++) yprof[idx][i]+=0.5*(y[i]-yprof[idx][i]);
+      }
+    }
+    prodFlow=pacc;
+  }
+
+  // Retentate, then permeate FROM THE CONSERVED BALANCE. Once the feed nears
+  // exhaustion some cells run backwards (dN<0); the running accumulator clamps
+  // those away and then over-counts — it reported recovery >200% at the extremes.
+  // What left the feed is exactly what reached the permeate, and is ≤ the feed.
+  let fend=Fin_i.slice(); for(const c of cells) for(let i=0;i<3;i++) fend[i]=Math.max(fend[i]-c.dN[i],0);
+  prodFlow=Fin_i.map((v,i)=>Math.max(v-fend[i],0));
+
+  const Pt=prodFlow[0]+prodFlow[1]+prodFlow[2];
+  const purity=Pt>0?prodFlow[0]/Pt:0;
+  const recovery=Fin_i[0]>0?prodFlow[0]/Fin_i[0]:0;
+  const recAll=prodFlow.map((pi,i)=>Fin_i[i]>0?pi/Fin_i[i]:0);
+  const stageCut=Fin>0?Pt/Fin:0;
+  const Fe=fend[0]+fend[1]+fend[2], retCO2=Fe>0?fend[0]/Fe:0;
+  const c0=cells[0];
+  const v0=c0.Jv/ctot;
+  return {
+    purity,recovery,stageCut,retCO2,recAll,Fin_i,xb0,
+    modulus:c0.xs[0]/c0.xb[0], pe:v0/ki[0], surf0:c0.xs[0], bulk0:c0.xb[0],
+    fluxCO2:c0.J[0]*22.414e-3*3600,          // m3(STP)/m2/h
+    k:ki[0], Re, cells,
+    sf:(purity/(1-purity))/(xb0[0]/(1-xb0[0]))
+  };
+}
+
+// ---------- scene geometry ----------
+const Z={w:980,h:300,xL:64,xR:876,
+  wallT:34,wallB:46, feedT:46,feedB:140, memT:140,memB:156, permT:156,permB:248};
+let R=null;                       // latest CP solution (selected mode)
+let Ralt=null,Rideal=null;
+
+// ---------- mass-conserving particle system ----------
+let parts=[], spawnAcc=0, fluxCDF=[[],[],[]], speedPx=1, crossProb=[0,0,0], curU=0.1;
+function setupParticles(){
+  // per-species crossing-position CDF weighted by local species flux
+  for(let i=0;i<3;i++){
+    let c=[],acc=0;
+    for(const cell of R.cells){ acc+=Math.max(cell.dN[i],0); c.push(acc); }
+    if(acc<=0){ c=R.cells.map((_,k)=>k+1); acc=c[c.length-1]; }
+    fluxCDF[i]=c.map(v=>v/acc);
+  }
+  // visibility gain: scale all recoveries together so crossing is visible while
+  // PRESERVING relative rates → permeate composition (purity) stays faithful.
+  const rec=R.recAll.map(r=>Math.max(r,0));
+  const maxr=Math.max(rec[0],rec[1],rec[2],1e-6);
+  const G=Math.min(8,Math.max(1,0.62/maxr));
+  crossProb=rec.map(r=>Math.min(0.95,r*G));
+  speedPx=1.1+3.6*Math.min(1,curU/0.5);
+}
+function sampleCrossX(sp){
+  const r=Math.random(), cdf=fluxCDF[sp];
+  let k=cdf.findIndex(v=>v>=r); if(k<0)k=cdf.length-1;
+  const frac=(k+Math.random())/cdf.length;
+  return Z.xL+frac*(Z.xR-Z.xL);
+}
+function spawnParticle(){
+  // species by feed composition
+  const fr=R.xb0;
+  const r=Math.random(); const sp=r<fr[0]?0:r<fr[0]+fr[1]?1:2;
+  const willCross=Math.random()<crossProb[sp];
+  const p={sp,x:Z.xL-6,y:Z.feedT+8+Math.random()*(Z.feedB-Z.feedT-16),
+    state:"feed",cross:willCross?sampleCrossX(sp):null,vy:0,ph:Math.random()*6.28};
+  parts.push(p);
+}
+function stepParticles(dt){
+  if(!R) return;
+  // spawn rate ∝ velocity, capped
+  spawnAcc+=dt*(0.7+speedPx*1.3);
+  while(spawnAcc>1 && parts.length<260){ spawnAcc-=1; spawnParticle(); }
+  const permDir = MODE==="counter" ? -1 : 1;
+  const permY = (Z.permT+Z.permB)/2;
+  const sev=Math.max(0,1-R.modulus);     // polarization severity drives visual segregation
+  const blTop=Z.feedB-30;                // the shaded boundary-layer band
+  for(const p of parts){
+    if(p.state==="feed"){
+      p.x+=speedPx;
+      p.y+=(Math.random()-0.5)*0.55;     // Brownian jitter
+      if(p.cross!==null){
+        // permeating molecules migrate to the membrane well before they cross,
+        // so crossings visibly come from the near-wall layer
+        const d=(p.cross-p.x);
+        if(d<190){ p.y+=(Z.feedB-7-p.y)*0.035; }
+        if(p.x>=p.cross){ p.state="cross"; p.vy=1.4; }
+      }else if(p.sp===0){
+        if(p.y>blTop) p.y-=0.45*sev;     // CO2 is stripped out of the wall layer
+      }else{
+        if(p.y<Z.feedB-9) p.y+=0.16*sev; // N2/O2 left behind enrich toward the wall
+        if(p.y>Z.feedB-12 && Math.random()<0.02) p.y-=Math.random()*18; // diffusive exchange back
+      }
+      if(p.y<Z.feedT+7)p.y=Z.feedT+7; if(p.y>Z.feedB-5)p.y=Z.feedB-5;
+      if(p.x>Z.xR+12) p.dead=true;       // retentate
+    }else if(p.state==="cross"){
+      p.x+=speedPx*0.3; p.y+=p.vy;
+      if(p.y>=permY){ p.state="perm"; }
+    }else{ // perm
+      p.x+=speedPx*0.85*permDir;
+      p.y=permY+Math.sin(p.x/26+p.ph)*7;
+      if(p.x<Z.xL-12 || p.x>Z.xR+12) p.dead=true;
+    }
+  }
+  parts=parts.filter(p=>!p.dead);
+}
+
+// ---------- drawing ----------
+const sc=$("scene"), g=sc.getContext("2d");
+const pc=$("prof"), pg=pc.getContext("2d");
+
+function drawScene(t){
+  g.clearRect(0,0,Z.w,Z.h);
+  const x0=Z.xL,x1=Z.xR;
+  // plastic wall (impermeable) — top
+  hatch(g,x0,Z.wallT,x1-x0,Z.wallB-Z.wallT,"#d9d6cc","#bfbcb1");
+  // feed channel
+  g.fillStyle="#f2f4f6"; g.fillRect(x0,Z.feedT,x1-x0,Z.feedB-Z.feedT);
+  // depletion shading near membrane
+  if(R){ const depl=1-Math.min(1,(R.bulk0-R.surf0)/Math.max(R.bulk0,1e-6));
+    const grd=g.createLinearGradient(0,Z.feedB-34,0,Z.feedB);
+    grd.addColorStop(0,"rgba(226,75,74,0)"); grd.addColorStop(1,`rgba(120,120,120,${0.16*(1-depl)})`);
+    g.fillStyle=grd; g.fillRect(x0,Z.feedB-34,x1-x0,34); }
+  g.strokeStyle="#c9c7be"; g.strokeRect(x0,Z.feedT,x1-x0,Z.feedB-Z.feedT);
+  // membrane
+  hatch(g,x0,Z.memT,x1-x0,Z.memB-Z.memT,"#b7d3a6","#7faf63");
+  // permeate channel
+  g.fillStyle="#fdeeec"; g.fillRect(x0,Z.permT,x1-x0,Z.permB-Z.permT);
+  g.strokeStyle="#e2cfc9"; g.strokeRect(x0,Z.permT,x1-x0,Z.permB-Z.permT);
+
+  // labels
+  g.font="11.5px -apple-system,Segoe UI,Arial"; g.textAlign="left";
+  g.fillStyle="#6f6c64"; g.fillText("plastic wall (impermeable)",x0+6,(Z.wallT+Z.wallB)/2+4);
+  g.fillStyle="#4f6f3a"; g.fillText("membrane",x0+6,(Z.memT+Z.memB)/2+4);
+  g.fillStyle="#9a4a48"; g.fillText("permeate channel",x0+6,Z.permB-7);
+  g.fillStyle="#5f5e5a"; g.fillText("feed channel — CO₂ depletes →",x0+6,Z.feedT+14);
+
+  // external arrows
+  arrow(g,x0-40,(Z.feedT+Z.feedB)/2,x0-4,(Z.feedT+Z.feedB)/2,"#E08A2B",3);
+  g.fillStyle="#E08A2B"; g.textAlign="center"; g.font="bold 11px Arial";
+  g.fillText("FEED",x0-22,(Z.feedT+Z.feedB)/2-7);
+  arrow(g,x1+4,(Z.feedT+Z.feedB)/2,x1+40,(Z.feedT+Z.feedB)/2,"#9b7d3a",3);
+  g.fillStyle="#9b7d3a"; g.fillText("RETENTATE",x1+26,(Z.feedT+Z.feedB)/2-7);
+  const py=(Z.permT+Z.permB)/2;
+  if(MODE==="co"){
+    arrow(g,x1+4,py,x1+40,py,"#B0322F",3);
+    g.fillStyle="#B0322F"; g.fillText("PRODUCT",x1+24,py+15);
+  }else{
+    arrow(g,x0-4,py,x0-40,py,"#B0322F",3);
+    g.fillStyle="#B0322F"; g.fillText("PRODUCT",x0-22,py+15);
+    g.fillStyle="#b7b4ab"; g.fillText("(sweep ←)",x1+24,py+15);
+  }
+
+  // particles
+  for(const p of parts){
+    const wob = p.state==="feed" ? Math.sin(t/430+p.ph)*3.2 + Math.sin(t/170+p.ph*1.7)*1.1 : 0;
+    g.beginPath(); g.arc(p.x,p.y+wob,4.4,0,6.2832);
+    g.fillStyle=COL[p.sp]; g.globalAlpha=p.state==="cross"?0.65:1; g.fill(); g.globalAlpha=1;
+  }
+}
+function drawProfile(){
+  if(!R) return;
+  const w=640,h=170,mL=40,mR=80,mT=12,mB=26;
+  pg.clearRect(0,0,w,h);
+  const X0=mL,X1=w-mR,Y0=mT,Y1=h-mB, N=R.cells.length;
+  pg.strokeStyle="#cfcdc4"; pg.lineWidth=1;
+  pg.beginPath();pg.moveTo(X0,Y0);pg.lineTo(X0,Y1);pg.lineTo(X1,Y1);pg.stroke();
+  pg.fillStyle="#9a988f"; pg.font="10.5px Arial"; pg.textAlign="center";
+  pg.fillText("feed inlet",X0+22,Y1+15); pg.fillText("retentate outlet",X1-34,Y1+15);
+  pg.save();pg.translate(11,(Y0+Y1)/2);pg.rotate(-Math.PI/2);pg.fillText("CO₂ mole fraction",0,0);pg.restore();
+  let ymax=0; for(const c of R.cells){ ymax=Math.max(ymax,c.xb[0]); }
+  for(let k=0;k<N;k++) ymax=Math.max(ymax, yget(k));
+  if(EXP.p!=null)ymax=Math.max(ymax,EXP.p/100);
+  if(EXP.r!=null)ymax=Math.max(ymax,EXP.r/100);
+  ymax=Math.min(1,ymax*1.12);
+  const X=k=>X0+(k/(N-1))*(X1-X0), Y=v=>Y1-(v/ymax)*(Y1-Y0);
+  // y gridlines
+  pg.fillStyle="#9a988f"; pg.textAlign="right";
+  for(const gv of [0,0.25,0.5,0.75,1].map(f=>f*ymax)){
+    pg.strokeStyle="#efece5"; pg.setLineDash([3,3]);
+    pg.beginPath();pg.moveTo(X0,Y(gv));pg.lineTo(X1,Y(gv));pg.stroke();pg.setLineDash([]);
+    pg.fillText((gv*100).toFixed(0)+"%",X0-4,Y(gv)+3);
+  }
+  // retentate bulk
+  line(R.cells.map((c,k)=>[X(k),Y(c.xb[0])]),"#E24B4A",2.4);
+  // surface (CP)
+  line(R.cells.map((c,k)=>[X(k),Y(c.xs[0])]),"#E24B4A",1.6,[5,4]);
+  // permeate (mixing cup)
+  line(R.cells.map((c,k)=>[X(k),Y(yget(k))]),"#9a3f9a",2.2);
+  // labels at right
+  pg.textAlign="left"; pg.font="10.5px Arial";
+  const lr=R.cells[N-1];
+  pg.fillStyle="#E24B4A"; pg.fillText("retentate",X1+4,Y(lr.xb[0])+3);
+  pg.fillStyle="#c98a8a"; pg.fillText("surface",X1+4,Y(lr.xs[0])+12);
+  pg.fillStyle="#9a3f9a"; pg.fillText("permeate",X1+4,Y(yget(N-1))-4);
+  // measured points (hollow circles) at the stream outlets:
+  // retentate at the channel exit; product where the permeate leaves (left end in counter-current)
+  function mark(x,v,col){ pg.strokeStyle=col; pg.lineWidth=2; pg.fillStyle="#fff";
+    pg.beginPath(); pg.arc(x,Y(v),4.5,0,6.2832); pg.fill(); pg.stroke(); }
+  if(EXP.r!=null) mark(X1,EXP.r/100,"#E24B4A");
+  if(EXP.p!=null) mark(MODE==="co"?X1:X0,EXP.p/100,"#9a3f9a");
+}
+let YPROF=null;
+function yget(k){ return YPROF?YPROF[k]:R.cells[k].xb[0]; }
+
+// experiment-vs-model bar chart: solid = model, hollow = measured
+const cc=$("cmp"), cg=cc.getContext("2d");
+function drawCmp(){
+  if(!R) return;
+  const w=640,h=160,mL=42,mB=30,mT=16,mR=14, y1=h-mB;
+  cg.clearRect(0,0,w,h);
+  const groups=[
+    {name:"Permeate CO₂",model:R.purity*100,exp:EXP.p,col:"#9a3f9a"},
+    {name:"Retentate CO₂",model:R.retCO2*100,exp:EXP.r,col:"#E24B4A"},
+  ];
+  let vmax=10; for(const g of groups) vmax=Math.max(vmax,g.model,g.exp||0);
+  vmax=Math.min(100,vmax*1.18);
+  const Y=v=>y1-(v/vmax)*(y1-mT);
+  cg.strokeStyle="#cfcdc4"; cg.lineWidth=1;
+  cg.beginPath(); cg.moveTo(mL,mT); cg.lineTo(mL,y1); cg.lineTo(w-mR,y1); cg.stroke();
+  cg.font="10.5px Arial"; cg.textAlign="right";
+  for(const f of [0.25,0.5,0.75,1]){ const gv=f*vmax;
+    cg.strokeStyle="#efece5"; cg.setLineDash([3,3]);
+    cg.beginPath(); cg.moveTo(mL,Y(gv)); cg.lineTo(w-mR,Y(gv)); cg.stroke(); cg.setLineDash([]);
+    cg.fillStyle="#9a988f"; cg.fillText(gv.toFixed(0)+"%",mL-4,Y(gv)+3); }
+  const gw=(w-mL-mR)/2;
+  groups.forEach((g,i)=>{
+    const cx=mL+gw*i+gw/2, bw=54;
+    cg.textAlign="center";
+    cg.globalAlpha=0.4; cg.fillStyle=g.col;
+    cg.fillRect(cx-bw-8,Y(g.model),bw,y1-Y(g.model));
+    cg.globalAlpha=1; cg.strokeStyle=g.col; cg.lineWidth=1.5;
+    cg.strokeRect(cx-bw-8,Y(g.model),bw,y1-Y(g.model));
+    cg.fillStyle="#5f5e5a"; cg.font="10.5px Arial";
+    cg.fillText(g.model.toFixed(1)+"%",cx-bw/2-8,Y(g.model)-4);
+    cg.fillText("model",cx-bw/2-8,y1+12);
+    if(g.exp!=null){
+      cg.fillStyle="#fff";
+      cg.fillRect(cx+8,Y(g.exp),bw,y1-Y(g.exp));
+      cg.strokeStyle=g.col; cg.lineWidth=2.2;
+      cg.strokeRect(cx+8,Y(g.exp),bw,y1-Y(g.exp));
+      cg.fillStyle="#5f5e5a";
+      cg.fillText(g.exp.toFixed(1)+"%",cx+8+bw/2,Y(g.exp)-4);
+      const d=g.exp-g.model;
+      cg.fillStyle=Math.abs(d)<2?"#5d8a3c":Math.abs(d)<5?"#b07a2c":"#c0392b";
+      cg.fillText("Δ "+(d>0?"+":"")+d.toFixed(1),cx+8+bw/2,y1+12);
+    }else{
+      cg.fillStyle="#b6b3aa";
+      cg.fillText("no data",cx+8+bw/2,y1-8);
+    }
+    cg.fillStyle="#46443f"; cg.font="600 11px Arial";
+    cg.fillText(g.name,cx,h-3);
+  });
+}
+
+function hatch(c,x,y,w,h,fill,stroke){
+  c.fillStyle=fill; c.fillRect(x,y,w,h);
+  c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+  c.strokeStyle=stroke;c.lineWidth=.8;
+  for(let i=-h;i<w;i+=7){c.beginPath();c.moveTo(x+i,y+h);c.lineTo(x+i+h,y);c.stroke();}
+  c.restore(); c.strokeStyle=stroke;c.lineWidth=1;c.strokeRect(x,y,w,h);
+}
+function line(pts,col,lw,dash){
+  pg.strokeStyle=col;pg.lineWidth=lw;pg.setLineDash(dash||[]);
+  pg.beginPath();pts.forEach((p,i)=>i?pg.lineTo(p[0],p[1]):pg.moveTo(p[0],p[1]));pg.stroke();pg.setLineDash([]);
+}
+function arrow(c,x1,y1,x2,y2,col,lw){
+  c.strokeStyle=col;c.lineWidth=lw||1.4;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
+  const a=Math.atan2(y2-y1,x2-x1),hl=7;
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-hl*Math.cos(a-0.42),y2-hl*Math.sin(a-0.42));
+  c.moveTo(x2,y2);c.lineTo(x2-hl*Math.cos(a+0.42),y2-hl*Math.sin(a+0.42));c.stroke();
+}
+
+// ---------- panel ----------
+function pct(v){return (v*100).toFixed(1)+"%";}
+function updatePanel(){
+  $("r_pur").textContent=pct(R.purity);
+  $("r_rec").textContent=pct(R.recovery);
+  $("r_cut").textContent=pct(R.stageCut);
+  $("r_ret").textContent=pct(R.retCO2);
+  // with no driving force the solver returns the (negative) bulk flux it would
+  // take to run backwards; report 0 so the readout matches the verdict
+  $("r_flux").textContent=(PS.pp>=PS.pf?0:R.fluxCO2).toFixed(2)+" m³/m²·h";
+  const Ntot=(R.Fin_i[0]+R.Fin_i[1]+R.Fin_i[2])*1e3;   // mmol/s
+  $("r_feedarea").textContent=Ntot.toFixed(2)+" mmol/s · "+Math.min(PS.Am,PS.L*PS.W*10).toFixed(0)+" cm²";
+  // experiment vs model: green within 2 pts, amber within 5, red beyond
+  function expRow(id,meas,model){
+    const el=$(id);
+    if(meas==null){ el.textContent="—"; el.style.color=""; return; }
+    const d=meas-model;
+    el.innerHTML=model.toFixed(1)+"% <small>·</small> Δ "+(d>0?"+":"")+d.toFixed(1);
+    el.style.color=Math.abs(d)<2?"#5d8a3c":Math.abs(d)<5?"#b07a2c":"#c0392b";
+  }
+  expRow("r_expp",EXP.p,R.purity*100);
+  expRow("r_expr",EXP.r,R.retCO2*100);
+  $("r_mod").textContent=R.modulus.toFixed(3);
+  const sev=1-R.modulus;
+  $("b_mod").style.width=Math.min(100,sev*140)+"%";
+  $("b_mod").style.background=R.modulus>0.95?"#7aa05a":R.modulus>0.7?"#d6a13a":"#d35c4a";
+  $("r_pe").textContent=R.pe.toFixed(3);
+  $("r_surf").textContent=pct(R.surf0)+"  vs  "+(R.bulk0*100).toFixed(0)+"%";
+  $("r_k").textContent=R.k.toExponential(1)+" m/s · "+(R.Re<2300?"laminar":"turbulent");
+  $("r_purideal").innerHTML=pct(Rideal.purity)+' <small>rec '+pct(Rideal.recovery)+'</small>';
+  const altName=MODE==="co"?"counter-current":"co-current";
+  $("r_alt").innerHTML=pct(Ralt.purity)+' <small>'+altName+', rec '+pct(Ralt.recovery)+'</small>';
+
+  const v=$("verdict"); let txt,bg,bd;
+  if(PS.pp>=PS.pf){
+    // no driving force anywhere: the module cannot separate, and the film model
+    // has nothing to solve. Flag it instead of showing a negative flux.
+    txt="<b>No driving force.</b> Permeate pressure ("+PS.pp+" bar) is at or above the feed ("+PS.pf+" bar), so nothing permeates — lower the permeate pressure or raise the feed.";
+    v.innerHTML=txt; v.style.background="#f0f0ee"; v.style.borderColor="#d5d3cb"; v.style.color="#46443f";
+    return;
+  }
+  if(R.modulus>0.95){txt="<b>Polarization negligible</b> at the inlet — the surface tracks the bulk. Any purity gap to the ideal is from the pressure ratio and axial depletion, not the boundary layer.";bg="#f0f6ec";bd="#cfe0c2";}
+  else if(R.modulus>0.80){txt="<b>Mild polarization.</b> A measurable CO₂-starved layer at the inlet; effective performance slips a little below the coupon value.";bg="#fbf4e6";bd="#ecdcb4";}
+  else if(R.modulus>0.55){txt="<b>Significant polarization.</b> The membrane sees a much leaner feed than the bulk near the inlet — flux is throttled. Faster feed or a thinner slit would recover it.";bg="#fbeede";bd="#eccaa0";}
+  else{txt="<b>Severe polarization.</b> The inlet surface is nearly stripped of CO₂ — you are limited by the boundary layer, not the material. A hydrodynamic problem.";bg="#fae8e6";bd="#e6b3ad";}
+  v.innerHTML=txt; v.style.background=bg; v.style.borderColor=bd; v.style.color="#46443f";
+}
+
+// ---------- wire up ----------
+// permeance state (GPU) — source of truth shared by sliders and number boxes
+const QS={co2:1000,n2:25,o2:75};
+function fmtQ(v){return v>=100?String(Math.round(v)):v>=10?v.toFixed(1):v.toFixed(2);}
+function fmtSel(v){return v>=10?v.toFixed(0):v.toFixed(1);}
+// scalar process parameters — source of truth, so typed values stay exact
+const PS={pf:5,flow:0.5,pp:1,gap:2,W:30,L:0.15,T:25,Am:30};
+let FLOWREF="std";                                       // "std" = NL/min (0 °C, 1 atm), "act" = actual at feed p,T
+function readParams(){
+  const RT=8.314*(273.15+PS.T);
+  // molar feed rate from the flow reading, then the ACTUAL volumetric flow at feed
+  // conditions sets the channel velocity (hence k and residence time)
+  let Ndot;                                              // mol/s
+  if(FLOWREF==="std") Ndot=(PS.flow/6e4)*101325/(8.314*273.15);
+  else                Ndot=(PS.flow/6e4)*PS.pf*1e5/RT;
+  const Vact=Ndot*RT/(PS.pf*1e5);                        // m^3/s at feed p,T
+  const u=Vact/((PS.W/1e3)*(PS.gap/1e3));
+  return {pf:PS.pf, n2:FS.n2, o2:FS.o2, flow:PS.flow, u, Am:PS.Am,
+    qco2:QS.co2, qn2:QS.n2, qo2:QS.o2, pp:PS.pp,
+    gap:PS.gap, W:PS.W, L:PS.L, T:PS.T};
+}
+function recompute(){
+  const p=readParams();
+  $("v_co2").textContent=(100-p.n2-p.o2).toFixed(1).replace(/\.0$/,"");
+  $("s_cn").textContent=fmtSel(p.qco2/p.qn2);
+  $("s_co").textContent=fmtSel(p.qco2/p.qo2);
+  $("s_on").textContent=fmtSel(p.qo2/p.qn2);
+  $("v_u").textContent=p.u.toFixed(p.u<0.1?3:2);
+  $("v_Achan").textContent=(p.L*p.W*10).toFixed(0);
+  curU=p.u;
+  R=runModule(p,MODE,false);
+  Rideal=runModule(p,MODE,true);
+  Ralt=runModule(p,MODE==="co"?"counter":"co",false);
+  // rebuild yprof for plot (re-run capturing it)
+  YPROF=buildYprof(p,MODE);
+  setupParticles(); drawProfile(); drawCmp(); updatePanel();
+  if(PAUSED) drawScene(performance.now());   // keep the frozen frame consistent
+}
+function buildYprof(p,mode){
+  // lightweight re-derivation of permeate mixing-cup profile for plotting
+  const cum=[]; let acc=[0,0,0];
+  if(mode==="counter"){
+    for(let k=R.cells.length-1;k>=0;k--){ for(let i=0;i<3;i++)acc[i]+=Math.max(R.cells[k].dN[i],0);
+      const t=acc[0]+acc[1]+acc[2]; cum[k]=t>0?acc[0]/t:R.cells[k].xb[0]; }
+  }else{
+    for(let k=0;k<R.cells.length;k++){ for(let i=0;i<3;i++)acc[i]+=Math.max(R.cells[k].dN[i],0);
+      const t=acc[0]+acc[1]+acc[2]; cum[k]=t>0?acc[0]/t:R.cells[k].xb[0]; }
+  }
+  return cum;
+}
+// scalar params: slider ↔ number box, PS holds the exact value
+const PSpec={
+  pf:{fmt:v=>v.toFixed(1)}, pp:{fmt:v=>v.toFixed(1)}, gap:{fmt:v=>v.toFixed(1)},
+  W:{fmt:v=>v.toFixed(0)}, L:{fmt:v=>v.toFixed(2)}, T:{fmt:v=>v.toFixed(0)},
+  Am:{fmt:v=>v.toFixed(0)},
+  flow:{log:true, fmt:v=>v<1?v.toFixed(2):v.toFixed(1)}
+};
+for(const [k,s] of Object.entries(PSpec)){
+  $(k).addEventListener("input",()=>{
+    PS[k]=s.log?Math.pow(10,+$(k).value):+$(k).value;
+    $(k+"_n").value=s.fmt(PS[k]);
+    recompute();
+  });
+  $(k+"_n").addEventListener("change",()=>{
+    const v=+$(k+"_n").value;
+    if($(k+"_n").value===""||!Number.isFinite(v)){ $(k+"_n").value=s.fmt(PS[k]); return; }
+    PS[k]=Math.min(Math.max(v,+$(k+"_n").min),+$(k+"_n").max);
+    $(k).value=s.log?Math.log10(PS[k]):PS[k];
+    $(k+"_n").value=PS[k];
+    recompute();
+  });
+}
+// ternary feed: FS is the source of truth; slider and number box both drive it,
+// clamped so N2+O2 ≤ 99 (CO2 balance ≥ 1%)
+const FS={n2:25,o2:7};
+[["n2","o2"],["o2","n2"]].forEach(([k,ok])=>{
+  $(k).addEventListener("input",()=>{
+    FS[k]=Math.min(+$(k).value,99-FS[ok]);
+    $(k).value=FS[k]; $(k+"_n").value=FS[k];
+    recompute();
+  });
+  $(k+"_n").addEventListener("change",()=>{
+    const v=+$(k+"_n").value;
+    if($(k+"_n").value!==""&&Number.isFinite(v)) FS[k]=Math.min(Math.max(v,0),99-FS[ok]);
+    $(k+"_n").value=FS[k]; $(k).value=FS[k];
+    recompute();
+  });
+});
+// permeances: log slider and number box both drive QS
+[["qco2","co2"],["qn2","n2"],["qo2","o2"]].forEach(([id,k])=>{
+  $(id).addEventListener("input",()=>{
+    QS[k]=Math.pow(10,+$(id).value);
+    $(id+"_n").value=fmtQ(QS[k]);
+    recompute();
+  });
+  $(id+"_n").addEventListener("change",()=>{
+    const v=+$(id+"_n").value;
+    if(Number.isFinite(v)&&v>0){ QS[k]=v; $(id).value=Math.log10(v); }
+    $(id+"_n").value=fmtQ(QS[k]);
+    recompute();
+  });
+});
+$("flowref").addEventListener("change",()=>{ FLOWREF=$("flowref").value; recompute(); });
+$("modeSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  MODE=b.dataset.mode;
+  [...$("modeSeg").children].forEach(x=>x.classList.toggle("on",x===b));
+  parts=[]; recompute();
+});
+function syncControls(){
+  for(const [k,s] of Object.entries(PSpec)){
+    $(k).value=s.log?Math.log10(PS[k]):PS[k];
+    $(k+"_n").value=s.fmt(PS[k]);
+  }
+  $("qco2").value=Math.log10(QS.co2); $("qco2_n").value=fmtQ(QS.co2);
+  $("qn2").value=Math.log10(QS.n2);   $("qn2_n").value=fmtQ(QS.n2);
+  $("qo2").value=Math.log10(QS.o2);   $("qo2_n").value=fmtQ(QS.o2);
+  $("n2").value=FS.n2; $("n2_n").value=FS.n2;
+  $("o2").value=FS.o2; $("o2_n").value=FS.o2;
+}
+$("reset").addEventListener("click",()=>{
+  Object.assign(PS,{pf:5,flow:0.5,pp:1,gap:2,W:30,L:0.15,T:25,Am:30});
+  Object.assign(QS,{co2:1000,n2:25,o2:75});
+  Object.assign(FS,{n2:25,o2:7});
+  FLOWREF="std"; $("flowref").value="std";
+  syncControls();
+  MODE="co"; [...$("modeSeg").children].forEach(x=>x.classList.toggle("on",x.dataset.mode==="co"));
+  parts=[]; recompute();
+});
+
+// experiment overlay: measured CO2 in permeate/retentate, persisted across sessions
+const EXP={p:null,r:null};
+function expStore(){ try{localStorage.setItem("cpExp",JSON.stringify(EXP));}catch(e){} }
+try{const s=JSON.parse(localStorage.getItem("cpExp")||"{}");
+  if(Number.isFinite(s.p))EXP.p=s.p; if(Number.isFinite(s.r))EXP.r=s.r;}catch(e){}
+if(EXP.p!=null)$("exp_p").value=EXP.p;
+if(EXP.r!=null)$("exp_r").value=EXP.r;
+[["exp_p","p"],["exp_r","r"]].forEach(([id,k])=>{
+  const apply=()=>{
+    const raw=$(id).value, v=+raw;
+    EXP[k]=(raw!==""&&Number.isFinite(v)&&v>=0&&v<=100)?v:null;
+    expStore(); drawProfile(); drawCmp(); updatePanel();
+  };
+  $(id).addEventListener("input",apply);   // live while typing
+  $(id).addEventListener("change",apply);
+});
+$("exp_clear").addEventListener("click",()=>{
+  EXP.p=EXP.r=null; $("exp_p").value=""; $("exp_r").value="";
+  expStore(); drawProfile(); drawCmp(); updatePanel();
+});
+
+// pause: freeze the particle field to inspect the gas distribution
+let PAUSED=false;
+$("pause").addEventListener("click",()=>{
+  PAUSED=!PAUSED;
+  $("pause").innerHTML=PAUSED?"&#9654; Run":"&#10074;&#10074; Pause";
+});
+
+let last=performance.now();
+function loop(now){ const dt=Math.min(2,(now-last)/16.67); last=now;
+  if(!PAUSED){ stepParticles(dt); drawScene(now); }
+  requestAnimationFrame(loop); }
+recompute(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+.DS_Store
+__pycache__/
+*.pyc
+.claude/
+_docs/
+_local/
+
+# Source / build files — kept locally, not published
+data/
+build.py
+DEPLOY.md
+README.md
+CLAUDE.md
+
+# climate-plot build sources: the raw Climate Reanalyzer payload is already embedded
+# in index.html, so publishing it again just re-hosts 118 kB of someone else's data.
+# Template + verifier are local build tooling, same rule as build.py / data/.
+climate-plot/sst_payload.json
+climate-plot/sst_template.html
+climate-plot/verify_render.py
+
+# Belt-and-braces: data/ above already covers these, but they are the fields that must
+# never reach a public commit, so name the files explicitly too.
+**/profile.json
+*.key
+*.pem
+.env
