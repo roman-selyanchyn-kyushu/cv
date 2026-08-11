@@ -2,8 +2,8 @@
    Design system shared with the Q-ENERGY Innovator Unit site. */
 
 :root{
-  --paper:#f6f3ec;--paper2:#efeae0;--ink:#19211d;--muted:#5f685f;--line:#d9d3c4;
-  --blue:#1f3a6b;--green:#2a8a86;--wine:#8a2347;--gold:#d4a84b;
+  --paper:#f7f5f1;--paper2:#efece6;--ink:#231916;--muted:#6b6560;--line:#ddd6ca;
+  --blue:#165193;--silver:#8f9499;--wine:#9c2350;--gold:#c9962f;
   /* All-sans (Inter). --serif kept as an alias so existing rules pick up Inter too. */
   --sans:"Inter","Noto Sans JP",system-ui,sans-serif;
   --serif:"Inter","Noto Sans JP",system-ui,sans-serif;
@@ -13,12 +13,12 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;scroll-
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.65;overflow-x:clip}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;z-index:-1;
-  background-image:radial-gradient(rgba(31,58,107,.06) 1px,transparent 1px);background-size:18px 18px}
+  background-image:radial-gradient(rgba(22,81,147,.06) 1px,transparent 1px);background-size:18px 18px}
 a{color:var(--blue);text-underline-offset:3px}
 img{max-width:100%}
 
 /* ── Topbar ─────────────────────────────────────────────── */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(246,243,236,.84);
+.topbar{position:sticky;top:0;z-index:50;background:rgba(247,245,241,.84);
   backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);
   border-bottom:1px solid var(--line)}
 /* The topbar runs wider than the --max content column: name + affiliations + an
@@ -30,7 +30,7 @@ img{max-width:100%}
 .program-mark .pm-name{display:flex;align-items:center;gap:10px;font:inherit;letter-spacing:inherit;
   color:inherit;text-decoration:none;transition:color .2s}
 .program-mark .pm-name:hover{color:var(--blue)}
-.program-mark .dot{width:10px;height:10px;background:linear-gradient(135deg,var(--wine),var(--blue),var(--green));
+.program-mark .dot{width:10px;height:10px;background:linear-gradient(135deg,var(--wine),var(--blue),var(--silver));
   border-radius:2px;transform:rotate(45deg);flex-shrink:0}
 .program-mark small{display:flex;align-items:center;gap:6px;font-family:var(--sans);font-size:10px;
   font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
@@ -40,8 +40,8 @@ img{max-width:100%}
 .landing-nav{display:flex;align-items:center;gap:2px}
 .landing-nav a{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--muted);
   text-decoration:none;padding:6px 7px;border-radius:6px;transition:color .2s,background .2s}
-.landing-nav a:hover{color:var(--blue);background:rgba(31,58,107,.06)}
-.landing-nav a.active{color:var(--blue);background:rgba(31,58,107,.09)}
+.landing-nav a:hover{color:var(--blue);background:rgba(22,81,147,.06)}
+.landing-nav a.active{color:var(--blue);background:rgba(22,81,147,.09)}
 /* EN / 日本語 switch — same pill toggle as the Q-ENERGY student site. */
 .lang-toggle{display:flex;padding:3px;background:var(--paper2);border:1px solid var(--line);
   border-radius:999px;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;
@@ -67,7 +67,7 @@ img{max-width:100%}
   .menu-btn{display:inline-flex}
   .landing-nav{display:none;position:absolute;top:calc(100% + 1px);left:0;right:0;flex-direction:column;
     align-items:stretch;gap:2px;background:var(--paper);border-bottom:1px solid var(--line);
-    box-shadow:0 14px 30px rgba(25,33,29,.13);padding:10px;z-index:60}
+    box-shadow:0 14px 30px rgba(35,25,22,.13);padding:10px;z-index:60}
   .landing-nav.open{display:flex}
   .landing-nav a{padding:13px 14px;border-radius:8px;font-size:15px}
 }
@@ -77,7 +77,7 @@ img{max-width:100%}
   display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(28px,5vw,64px);align-items:center}
 .hero-photo{order:1}
 .hero-photo img{width:100%;max-width:320px;aspect-ratio:4/5;object-fit:cover;object-position:center top;
-  border-radius:18px;box-shadow:0 1px 0 rgba(26,31,28,.04),0 30px 80px -30px rgba(26,31,28,.28)}
+  border-radius:18px;box-shadow:0 1px 0 rgba(35,25,22,.04),0 30px 80px -30px rgba(35,25,22,.28)}
 .hero-copy{order:2}
 .hero-copy .eyebrow{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.18em;
   text-transform:uppercase;color:var(--blue);margin:0 0 18px;display:flex;align-items:center;gap:10px}
@@ -85,7 +85,7 @@ img{max-width:100%}
 .hero-copy h1{font-family:var(--sans);font-weight:700;font-size:clamp(34px,4.6vw,56px);line-height:1.04;
   letter-spacing:-.03em;color:var(--ink);margin:0 0 8px}
 .hero-names{font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--muted);letter-spacing:.02em;margin:0 0 18px}
-.hero-role{font-family:var(--serif);font-size:clamp(16px,1.8vw,19px);line-height:1.6;color:#3a423d;margin:0 0 6px}
+.hero-role{font-family:var(--serif);font-size:clamp(16px,1.8vw,19px);line-height:1.6;color:#4a423e;margin:0 0 6px}
 .hero-affil{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0}
 .hero-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
 .chip-link{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:999px;
@@ -107,7 +107,7 @@ img{max-width:100%}
 .kicker:before{content:"";width:24px;height:1px;background:var(--blue)}
 .section h2{font-family:var(--sans);font-weight:700;font-size:clamp(24px,2.8vw,33px);letter-spacing:-.02em;
   color:var(--ink);margin:0 0 18px;line-height:1.15}
-.lead{font-family:var(--sans);font-size:clamp(15px,1.5vw,16.5px);line-height:1.75;color:#3a423d;margin:0 0 16px;max-width:70ch}
+.lead{font-family:var(--sans);font-size:clamp(15px,1.5vw,16.5px);line-height:1.75;color:#4a423e;margin:0 0 16px;max-width:70ch}
 
 /* ── About: interests + stats ───────────────────────────── */
 .about-meta{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0 0 20px}
@@ -128,7 +128,7 @@ img{max-width:100%}
 .timeline{display:flex;flex-direction:column;gap:12px}
 .tl-item{display:grid;grid-template-columns:168px 1fr;gap:clamp(12px,3vw,30px);
   background:rgba(255,255,255,.45);border:1px solid var(--line);border-radius:14px;
-  padding:18px 22px;box-shadow:0 18px 50px -34px rgba(26,31,28,.3)}
+  padding:18px 22px;box-shadow:0 18px 50px -34px rgba(35,25,22,.3)}
 .tl-date{font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:.04em;color:var(--blue);
   padding-top:3px;display:flex;align-items:baseline;gap:8px}
 .tl-date:before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--blue);
@@ -156,18 +156,18 @@ img{max-width:100%}
 .pub-badges{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}
 .badge{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   padding:3px 9px;border-radius:999px}
-.badge.role{background:rgba(31,58,107,.08);color:var(--blue)}
+.badge.role{background:rgba(22,81,147,.08);color:var(--blue)}
 .badge.doi{background:transparent;border:1px solid var(--line);color:var(--muted);text-decoration:none}
 .badge.doi:hover{color:var(--blue);border-color:var(--blue)}
-.badge.note{background:rgba(212,168,75,.16);color:#8a6a1e;text-transform:none;letter-spacing:0;font-weight:600}
+.badge.note{background:rgba(201,150,47,.15);color:#7d5f1c;text-transform:none;letter-spacing:0;font-weight:600}
 .pub-featured{background:rgba(255,255,255,.45);border:1px solid var(--line);border-radius:14px;
-  padding:18px 20px;margin-bottom:14px;box-shadow:0 18px 50px -34px rgba(26,31,28,.3)}
+  padding:18px 20px;margin-bottom:14px;box-shadow:0 18px 50px -34px rgba(35,25,22,.3)}
 .pub-featured .pub{grid-template-columns:1fr;border-top:0;padding:0}
 
 /* ── Courses (teaching) ─────────────────────────────────── */
 .courses{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .course{background:rgba(255,255,255,.45);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
-  box-shadow:0 18px 50px -34px rgba(26,31,28,.3)}
+  box-shadow:0 18px 50px -34px rgba(35,25,22,.3)}
 .course-name{font-family:var(--sans);font-weight:600;font-size:15px;line-height:1.35;color:var(--ink);margin:0 0 4px}
 .course-ja{font-weight:500;color:var(--muted)}
 .course-meta{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0}
@@ -177,8 +177,8 @@ img{max-width:100%}
 .apps-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .app-card{display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.45);
   border:1px solid var(--line);border-radius:14px;padding:22px 24px;text-decoration:none;color:inherit;
-  box-shadow:0 18px 50px -34px rgba(26,31,28,.3);transition:transform .2s,box-shadow .2s,border-color .2s}
-.app-card:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 26px 60px -34px rgba(26,31,28,.42)}
+  box-shadow:0 18px 50px -34px rgba(35,25,22,.3);transition:transform .2s,box-shadow .2s,border-color .2s}
+.app-card:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 26px 60px -34px rgba(35,25,22,.42)}
 .app-title{font-family:var(--sans);font-weight:700;font-size:17px;line-height:1.3;color:var(--ink);margin:0}
 .app-blurb{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--muted);margin:0;flex:1}
 .app-tags{display:flex;flex-wrap:wrap;gap:6px}
